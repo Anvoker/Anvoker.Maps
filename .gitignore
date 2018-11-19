@@ -36,6 +36,7 @@ sysinfo.txt
 *.unitypackage
 
 #Other
+StyleCop.Cache
 /[Pp]ackages/
 /paket/paket.exe
 /paket/paket.unity3d.exe
