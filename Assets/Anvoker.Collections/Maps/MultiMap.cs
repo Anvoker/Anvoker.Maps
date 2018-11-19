@@ -27,6 +27,7 @@ namespace Anvoker.Collections.Maps
 
         private Dictionary<TKey, HashSet<TVal>> multiDict;
         private IEqualityComparer<TVal> comparerValue;
+        private ValueSets<TKey, TVal> valueSets;
 
         #endregion Private Fields
 
@@ -277,8 +278,9 @@ namespace Anvoker.Collections.Maps
         /// Gets an enumeration of the <see cref="MultiMap{TKey, TVal}"/>'s
         /// values.
         /// </summary>
-        public ICollection<ICollection<TVal>> Values
-            => ((IDictionary<TKey, ICollection<TVal>>)multiDict).Values;
+        public ValueSets<TKey, TVal> Values
+            => valueSets ?? (valueSets = new ValueSets<TKey, TVal>(
+                multiDict.Values));
 
         #endregion Public Properties
 
@@ -295,6 +297,82 @@ namespace Anvoker.Collections.Maps
         #endregion Public Indexers
 
         #region Public Methods
+
+        /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiMap{TKey, TVal}"/>, adds the specified value to that
+        /// key; otherwise it adds a new element with the specified key and
+        /// value.
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="value">The value of the element. The value can
+        /// be null for reference types.</param>
+        /// <returns>True if either the key didn't already exist or the value
+        /// didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, TVal value)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValue(key, value);
+            }
+            else
+            {
+                AddKey(key, value);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiMap{TKey, TVal}"/>, adds the specified values to
+        /// that key; otherwise it adds a new element with the specified key and
+        /// values.
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="values">The values of the element.</param>
+        /// <returns>True if either the key didn't already exist or at least one
+        /// value didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, IEnumerable<TVal> values)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValues(key, values);
+            }
+            else
+            {
+                AddKey(key, values);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiMap{TKey, TVal}"/>, adds the specified values to
+        /// that key; otherwise it adds a new element with the specified key and
+        /// values. <para>This doesn't copy the collection, it passes it by
+        /// reference.</para> <para>Will throw <see cref="ArgumentException"/>
+        /// if the passed <see cref="HashSet{TVal}"/>'s comparer isn't reference
+        /// equal to <see cref="ComparerValue"/>.</para>
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="values">The values of the element.</param>
+        /// <returns>True if either the key didn't already exist or at least one
+        /// value didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, HashSet<TVal> values)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValues(key, values);
+            }
+            else
+            {
+                AddKey(key, values);
+                return true;
+            }
+        }
 
         /// <summary>
         /// Adds the specified key to the <see cref="MultiMap{TKey, TVal}"/>
@@ -630,6 +708,9 @@ namespace Anvoker.Collections.Maps
         IEnumerable<TKey>
             IReadOnlyDictionary<TKey, TVal>.Keys => multiDict.Keys;
 
+        ICollection<ICollection<TVal>>
+            IDictionary<TKey, ICollection<TVal>>.Values => Values;
+
         IEnumerable<ICollection<TVal>>
             IReadOnlyDictionary<TKey, ICollection<TVal>>.Values
             => multiDict.Values;
@@ -692,12 +773,11 @@ namespace Anvoker.Collections.Maps
 
         void IDictionary<TKey, ICollection<TVal>>.Add(
             TKey key, ICollection<TVal> value)
-            => multiDict.Add(key, new HashSet<TVal>(value, ComparerValue));
+            => Add(key, value);
 
         void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Add(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => multiDict.Add(
-                item.Key, new HashSet<TVal>(item.Value, ComparerValue));
+            => Add(item.Key, item.Value);
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
             KeyValuePair<TKey, ICollection<TVal>> item)
@@ -724,11 +804,13 @@ namespace Anvoker.Collections.Maps
         }
 
         bool IDictionary<TKey, ICollection<TVal>>.Remove(TKey key)
-            => multiDict.Remove(key);
+            => RemoveKey(key);
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Remove(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => ((IDictionary<TKey, ICollection<TVal>>)multiDict).Remove(item);
+            => ContainsKey(item.Key)
+            && multiDict[item.Key].SetEquals(item.Value)
+            && RemoveKey(item.Key);
 
         bool IReadOnlyDictionary<TKey, TVal>.TryGetValue(
             TKey key,
