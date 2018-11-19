@@ -330,12 +330,25 @@ namespace Anvoker.Collections.Maps
         /// <summary>
         /// Adds the specified key and its associated values to the
         /// <see cref="MultiMap{TKey, TVal}"/>. This doesn't copy the
-        /// collection, it passes it directly.
+        /// collection, it passes it by reference. <para>Will throw
+        /// <see cref="ArgumentException"/> if the passed
+        /// <see cref="HashSet{TVal}"/>'s comparer isn't reference equal to
+        /// <see cref="ComparerValue"/>.</para>
         /// </summary>
         /// <param name="key">The key of the element to add.</param>
         /// <param name="values">The values of the element to add.</param>
         public void AddKey(TKey key, HashSet<TVal> values)
-            => multiDict.Add(key, values);
+        {
+            if (ReferenceEquals(values.Comparer, ComparerValue))
+            {
+                throw new ArgumentException(
+                    $@"The Comparer of the passed HashSet argument has to be
+                        reference equal to the {nameof(ComparerValue)} of the
+                        {nameof(MultiMap<TKey, TVal>)}.", nameof(values));
+            }
+
+            multiDict.Add(key, values);
+        }
 
         /// <summary>
         /// Adds the value to the specified key in the
