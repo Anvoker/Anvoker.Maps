@@ -344,7 +344,8 @@ namespace Anvoker.Collections.Maps
                 throw new ArgumentException(
                     $@"The Comparer of the passed HashSet argument has to be
                         reference equal to the {nameof(ComparerValue)} of the
-                        {nameof(MultiMap<TKey, TVal>)}.", nameof(values));
+                        {nameof(MultiMap<TKey, TVal>)}.",
+                    nameof(values));
             }
 
             multiDict.Add(key, values);
