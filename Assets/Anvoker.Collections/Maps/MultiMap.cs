@@ -302,7 +302,7 @@ namespace Anvoker.Collections.Maps
         /// </summary>
         /// <param name="key">The key of the element to add.</param>
         public void AddKey(TKey key)
-            => multiDict.Add(key, new HashSet<TVal>());
+            => multiDict.Add(key, new HashSet<TVal>(ComparerValue));
 
         /// <summary>
         /// Adds the specified key and its associated value to the
@@ -314,7 +314,7 @@ namespace Anvoker.Collections.Maps
         public void AddKey(TKey key, TVal value)
         {
 #pragma warning disable IDE0022 // Use expression body for methods
-            multiDict.Add(key, new HashSet<TVal>() { value });
+            multiDict.Add(key, new HashSet<TVal>(ComparerValue) { value });
 #pragma warning restore IDE0022 // Use expression body for methods
         }
 
@@ -325,7 +325,7 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the element to add.</param>
         /// <param name="values">The values of the element to add.</param>
         public void AddKey(TKey key, IEnumerable<TVal> values)
-            => multiDict.Add(key, new HashSet<TVal>(values));
+            => multiDict.Add(key, new HashSet<TVal>(values, ComparerValue));
 
         /// <summary>
         /// Adds the specified key and its associated values to the
@@ -582,7 +582,8 @@ namespace Anvoker.Collections.Maps
 
             try
             {
-                if (success = multiDict.TryGetValue(key, out HashSet<TVal> hashSetValues))
+                if (success = multiDict.TryGetValue(
+                    key, out HashSet<TVal> hashSetValues))
                 {
                     value = hashSetValues;
                 }
@@ -667,7 +668,7 @@ namespace Anvoker.Collections.Maps
 
             set
             {
-                multiDict[key] = new HashSet<TVal>(value);
+                multiDict[key] = new HashSet<TVal>(value, ComparerValue);
             }
         }
 
@@ -677,11 +678,12 @@ namespace Anvoker.Collections.Maps
 
         void IDictionary<TKey, ICollection<TVal>>.Add(
             TKey key, ICollection<TVal> value)
-            => multiDict.Add(key, new HashSet<TVal>(value));
+            => multiDict.Add(key, new HashSet<TVal>(value, ComparerValue));
 
         void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Add(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => multiDict.Add(item.Key, new HashSet<TVal>(item.Value));
+            => multiDict.Add(
+                item.Key, new HashSet<TVal>(item.Value, ComparerValue));
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
             KeyValuePair<TKey, ICollection<TVal>> item)
