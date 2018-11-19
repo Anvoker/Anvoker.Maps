@@ -96,7 +96,8 @@ namespace Anvoker.Collections.Maps
         {
             multiDict = new Dictionary<TKey, HashSet<TVal>>(
                 capacity, comparerKey);
-            this.comparerValue = comparerValue;
+            this.comparerValue = comparerValue
+                ?? EqualityComparer<TVal>.Default;
         }
 
         /// <summary>
@@ -125,7 +126,8 @@ namespace Anvoker.Collections.Maps
         {
             multiDict = new Dictionary<TKey, HashSet<TVal>>(
                 multiMap, comparerKey);
-            this.comparerValue = comparerValue;
+            this.comparerValue = comparerValue
+                ?? EqualityComparer<TVal>.Default;
         }
 
         /// <summary>
