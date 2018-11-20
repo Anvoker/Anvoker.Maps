@@ -10,14 +10,16 @@ namespace Anvoker.Collections.Maps.Tests
     /// <para>This class is inherited from and fed the proper type arguments
     /// in order to run all of the tests on a particular class.</para>
     /// </summary>
-    /// <typeparam name="TKey">Type of the key inside the IDictionary.</typeparam>
+    /// <typeparam name="TKey">Type of the key inside the IDictionary.
+    /// </typeparam>
     /// <typeparam name="TVal">Type of the value inside of the nested collection
     /// <see cref="TValCol"/>, which works as the value type of the IDictionary.
     /// </typeparam>
     /// <typeparam name="TIDict">Type of the dictionary interface.
     /// </typeparam>
-    /// <typeparam name="TValCol">Type of the nested collection used as the value
-    /// type of the dictionary interface.</typeparam>
+    /// <typeparam name="TValCol">Type of the nested collection used as the
+    /// value type of the dictionary interface.
+    /// </typeparam>
     public class NestedIDictionaryBase<TKey, TVal, TIDict, TValCol>
         where TIDict : IDictionary<TKey, TValCol>
         where TValCol : IEnumerable<TVal>
@@ -67,15 +69,14 @@ namespace Anvoker.Collections.Maps.Tests
         [Test]
         public void ContainsInitialKeys()
         {
-            bool[] result = new bool[initialKeys.Length];
             var fails = new List<TKey>();
             bool testPassed = true;
 
             for (int i = 0; i < initialKeys.Length; i++)
             {
-                result[i] = collection.ContainsKey(initialKeys[i]);
-                testPassed |= result[i];
-                if (!result[i])
+                bool result = collection.ContainsKey(initialKeys[i]);
+                testPassed |= result;
+                if (!result)
                 {
                     fails.Add(initialKeys[i]);
                 }
@@ -100,15 +101,14 @@ namespace Anvoker.Collections.Maps.Tests
         [Test]
         public void ContainsNoExcludedKeys()
         {
-            bool[] result = new bool[excludedKeys.Length];
             var fails = new List<TKey>();
             bool testPassed = true;
 
             for (int i = 0; i < initialKeys.Length; i++)
             {
-                result[i] = collection.ContainsKey(excludedKeys[i]);
-                testPassed |= !result[i];
-                if (result[i])
+                bool result = collection.ContainsKey(excludedKeys[i]);
+                testPassed |= !result;
+                if (result)
                 {
                     fails.Add(excludedKeys[i]);
                 }
