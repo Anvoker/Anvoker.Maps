@@ -104,7 +104,7 @@ namespace Anvoker.Collections.Maps.Tests
             var fails = new List<TKey>();
             bool testPassed = true;
 
-            for (int i = 0; i < initialKeys.Length; i++)
+            for (int i = 0; i < excludedKeys.Length; i++)
             {
                 bool result = collection.ContainsKey(excludedKeys[i]);
                 testPassed |= !result;
