@@ -31,6 +31,9 @@ namespace Anvoker.Collections.Maps
         private KeyCollection keyCollection;
         private ValueCollection valueCollection;
 
+        private IEqualityComparer<TKey> comparerKey;
+        private IEqualityComparer<TVal> comparerValue;
+
         /// <summary>
         /// Keeps track of how often a value occurs in the multimap.
         /// </summary>
@@ -129,6 +132,10 @@ namespace Anvoker.Collections.Maps
             dictRev = new Dictionary<HashSet<TVal>, TKey>(capacity);
             dictRevFlat = new Dictionary<TVal, HashSet<TKey>>(
                 capacity, comparerValue);
+            this.comparerKey = comparerKey
+                ?? EqualityComparer<TKey>.Default;
+            this.comparerValue = comparerValue
+                ?? EqualityComparer<TVal>.Default;
             keysWithNullValue = new HashSet<TKey>(comparerKey);
             dictValOccurance = new Dictionary<TVal, int>(comparerValue);
             keyCollection = new KeyCollection(this);
@@ -304,14 +311,14 @@ namespace Anvoker.Collections.Maps
         /// determine equality of keys for the
         /// <see cref="BiMap{TKey, TVal}"/>.
         /// </summary>
-        public IEqualityComparer<TKey> ComparerKey => dictFwd.Comparer;
+        public IEqualityComparer<TKey> ComparerKey => comparerKey;
 
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{T}"/> that is used to
         /// determine equality of values for the
         /// <see cref="BiMap{TKey, TVal}"/>.
         /// </summary>
-        public IEqualityComparer<TVal> ComparerValue => dictRevFlat.Comparer;
+        public IEqualityComparer<TVal> ComparerValue => comparerValue;
 
         /// <summary>
         /// Gets the number of key-to-values elements contained in the
@@ -827,7 +834,7 @@ namespace Anvoker.Collections.Maps
         {
             try
             {
-                if (dictFwd.ContainsKey(key))
+                if (!dictFwd.ContainsKey(key))
                 {
                     return false;
                 }
@@ -844,19 +851,43 @@ namespace Anvoker.Collections.Maps
             }
 
             var hashSet = dictFwd[key];
-            dictFwd.Remove(key);
-            dictRev.Remove(hashSet);
+            bool fwdSuccess = dictFwd.Remove(key);
+            bool revSuccess = dictRev.Remove(hashSet);
+
+            #if DEVELOPMENT_BUILD || UNITY_EDITOR
+                if (!fwdSuccess)
+                {
+                    throw new InvalidProgramException();
+                }
+
+                if (!revSuccess)
+                {
+                    throw new InvalidProgramException();
+                }
+            #endif
 
             foreach (TVal val in hashSet)
             {
                 if (val != null)
                 {
-                    dictRevFlat[val].Remove(key);
+                    bool revFlatSuccess = dictRevFlat[val].Remove(key);
+                    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+                        if (!revFlatSuccess)
+                        {
+                            throw new InvalidProgramException();
+                        }
+                    #endif
                     DecrementOrRemoveValueOccurance(val);
                 }
                 else
                 {
-                    keysWithNullValue.Remove(key);
+                    bool keysNullSuccess = keysWithNullValue.Remove(key);
+                    #if DEVELOPMENT_BUILD || UNITY_EDITOR
+                        if (!keysNullSuccess)
+                        {
+                            throw new InvalidProgramException();
+                        }
+                    #endif
                     nullValOccurance--;
                 }
             }
@@ -1108,9 +1139,9 @@ namespace Anvoker.Collections.Maps
             return success;
         }
 
-        #endregion Public Methods
+#endregion Public Methods
 
-        #region Private Methods
+#region Private Methods
 
         private bool AddExistingKey(TKey key, TVal val)
         {
@@ -1276,7 +1307,7 @@ namespace Anvoker.Collections.Maps
             }
         }
 
-        #endregion Private Methods
+#endregion Private Methods
     }
 
     /// <content>
@@ -1284,7 +1315,7 @@ namespace Anvoker.Collections.Maps
     /// </content>
     public partial class MultiBiMap<TKey, TVal>
     {
-        #region Public Properties
+#region Public Properties
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.IsReadOnly
             => false;
@@ -1314,9 +1345,9 @@ namespace Anvoker.Collections.Maps
             IReadOnlyDictionary<TKey, ICollection<TVal>>.Values
             => dictFwd.Values;
 
-        #endregion Public Properties
+#endregion Public Properties
 
-        #region Public Indexers
+#region Public Indexers
 
         ICollection<TVal>
             IReadOnlyDictionary<TKey, ICollection<TVal>>.this[TKey key]
@@ -1357,21 +1388,34 @@ namespace Anvoker.Collections.Maps
             }
         }
 
-        #endregion Public Indexers
+#endregion Public Indexers
 
-        #region Public Methods
+#region Public Methods
 
         void IDictionary<TKey, ICollection<TVal>>.Add(
-            TKey key, ICollection<TVal> value) => AddNewKey(key, value);
+            TKey key, ICollection<TVal> value) => Add(key, value);
 
         void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Add(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => AddKey(item.Key, item.Value);
+            => Add(item.Key, item.Value);
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => ContainsKey(item.Key)
-            && dictFwd[item.Key].SetEquals(item.Value);
+        {
+            if (!ContainsKey(item.Key))
+            {
+                return false;
+            }
+
+            if (item.Value == null)
+            {
+                return dictFwd[item.Key] == null;
+            }
+            else
+            {
+                return dictFwd[item.Key].SetEquals(item.Value);
+            }
+        }
 
         void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.CopyTo(
             KeyValuePair<TKey, ICollection<TVal>>[] array,
@@ -1402,7 +1446,10 @@ namespace Anvoker.Collections.Maps
             => RemoveKey(key);
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Remove(
-            KeyValuePair<TKey, ICollection<TVal>> item) => RemoveKey(item.Key);
+            KeyValuePair<TKey, ICollection<TVal>> item) =>
+            ContainsKey(item.Key)
+            && dictFwd[item.Key].SetEquals(item.Value)
+            && RemoveKey(item.Key);
 
         bool IReadOnlyDictionary<TKey, ICollection<TVal>>.TryGetValue(
             TKey key,
@@ -1453,6 +1500,6 @@ namespace Anvoker.Collections.Maps
             return success;
         }
 
-        #endregion Public Methods
+#endregion Public Methods
     }
 }
