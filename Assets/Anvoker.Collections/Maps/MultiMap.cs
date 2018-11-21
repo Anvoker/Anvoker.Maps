@@ -781,7 +781,8 @@ namespace Anvoker.Collections.Maps
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
             KeyValuePair<TKey, ICollection<TVal>> item)
-            => multiDict.ContainsKey(item.Key)
+            => item.Value != null
+            && multiDict.ContainsKey(item.Key)
             && multiDict[item.Key].SetEquals(item.Value);
 
         void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.CopyTo(
