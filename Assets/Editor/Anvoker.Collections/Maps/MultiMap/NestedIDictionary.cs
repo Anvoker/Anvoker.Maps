@@ -14,34 +14,20 @@ namespace Anvoker.Collections.Maps.Tests.MultiMap.IDictionary
     /// <see cref="MultiMap{TKey, TVal}"/>.</typeparam>
     /// <typeparam name="TVal">Type of the values in the
     /// <see cref="MultiMap{TKey, TVal}"/>.</typeparam>
+    [TestFixture]
     public class NestedIDictionary<TKey, TVal>
         : NestedIDictionaryBase<TKey, TVal, MultiMap<TKey, TVal>,
             ICollection<TVal>>
     {
         /// <summary>
         /// Initializes a new instance of the
-        /// <see cref="NestedIDictionary{TKey, TVal}"/> class with and the
-        /// specified keys and values.
+        /// <see cref="NestedIDictionary{TKey, TVal}"/>
+        /// class with <see cref="MultiMap{TKey, TVal}"/> as the collection
+        /// being tested.
         /// </summary>
-        /// <param name="multiMap">An instance of
-        /// <see cref="MultiMap{TKey, TVal}"/> already initialized with the
-        /// specified keys and values.</param>
-        /// <param name="initialKeys">An enumeration of keys also found in the
-        /// specified <paramref name="multiMap"/>.
-        /// <para>Used to verify tests.</para></param>
-        /// <param name="initialValueCollections">An enumeration of collections
-        /// of values also found in <paramref name="multiMap"/>.
-        /// <para>Used to verify tests.</para></param>
-        /// <param name="excludedKeys">An enumeration of value of the same type
-        /// as the keys in <paramref name="multiMap"/>, none of which are
-        /// contained in <paramref name="multiMap"/>.
-        /// <para>Used to test for false positives.</para></param>
-        public NestedIDictionary(
-            MultiMap<TKey, TVal> multiMap,
-            TKey[] initialKeys,
-            ICollection<TVal>[] initialValueCollections,
-            TKey[] excludedKeys)
-            : base(multiMap, initialKeys, initialValueCollections, excludedKeys)
+        /// <param name="args">A data class containing all of the necessary
+        /// arguments for initializing the tests.</param>
+        public NestedIDictionary(Args args) : base(args)
         {
         }
     }
