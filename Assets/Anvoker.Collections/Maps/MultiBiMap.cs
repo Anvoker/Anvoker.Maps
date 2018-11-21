@@ -354,6 +354,82 @@ namespace Anvoker.Collections.Maps
         #region Public Methods
 
         /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>, adds the specified value to
+        /// that key; otherwise it adds a new element with the specified key and
+        /// value.
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="value">The value of the element. The value can
+        /// be null for reference types.</param>
+        /// <returns>True if either the key didn't already exist or the value
+        /// didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, TVal value)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValue(key, value);
+            }
+            else
+            {
+                AddKey(key, value);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>, adds the specified values to
+        /// that key; otherwise it adds a new element with the specified key and
+        /// values.
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="values">The values of the element.</param>
+        /// <returns>True if either the key didn't already exist or at least one
+        /// value didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, IEnumerable<TVal> values)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValues(key, values);
+            }
+            else
+            {
+                AddKey(key, values);
+                return true;
+            }
+        }
+
+        /// <summary>
+        /// If the specified key already exists in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>, adds the specified values to
+        /// that key; otherwise it adds a new element with the specified key and
+        /// values. <para>This doesn't copy the collection, it passes it by
+        /// reference.</para> <para>Will throw <see cref="ArgumentException"/>
+        /// if the passed <see cref="HashSet{TVal}"/>'s comparer isn't reference
+        /// equal to <see cref="ComparerValue"/>.</para>
+        /// </summary>
+        /// <param name="key">The key of the element.</param>
+        /// <param name="values">The values of the element.</param>
+        /// <returns>True if either the key didn't already exist or at least one
+        /// value didn't already exist on the specified key; otherwise, false.
+        /// </returns>
+        public bool Add(TKey key, HashSet<TVal> values)
+        {
+            if (ContainsKey(key))
+            {
+                return AddValues(key, values);
+            }
+            else
+            {
+                AddKey(key, values);
+                return true;
+            }
+        }
+
+        /// <summary>
         /// Adds the specified key to the <see cref="MultiBiMap{TKey, TVal}"/>
         /// with an empty value collection.
         /// </summary>
