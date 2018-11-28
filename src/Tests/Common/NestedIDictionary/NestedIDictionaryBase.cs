@@ -62,6 +62,7 @@ namespace Anvoker.Collections.Tests.Common.NestedIDictionary
         /// takes <see cref="IEnumerable{T}"/> and returns a new value
         /// collection <typeparamref name="TValCol"/></param>
         /// <param name="data">The concrete test data.</param>
+        /// <param name="testName">Name displayed in the test runner.</param>
         /// <returns>A new instance of <see cref="TestFixtureParameters"/> that
         /// can be used to instantiate a
         /// <see cref="NestedIDictionaryBase{TKey, TVal, TIDict, TValCol}"/>
@@ -70,12 +71,14 @@ namespace Anvoker.Collections.Tests.Common.NestedIDictionary
             ConstructFixtureParams(
             Func<TIDict> ctorImplementor,
             Func<IEnumerable<TVal>, TValCol> ctorTValCol,
-            MapTestData<TKey, TVal> data)
+            MapTestData<TKey, TVal> data,
+            string testName)
         {
             var args = new Args(
                 ctorImplementor, ctorTValCol, data);
             var exposedParams = new ExposedTestFixtureParams()
             {
+                TestName = testName,
                 Arguments = new object[] { args },
                 Properties = new PropertyBag(),
                 RunState = RunState.Runnable,

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using NUnit.Framework;
-using NUnit.Framework.Internal;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common;
 using Anvoker.Collections.Tests.Maps.NestedIDictionary;
+using NUnit.Framework;
+using NUnit.Framework.Internal;
 
 namespace Anvoker.Collections.Tests.Maps.MultiMap
 {
@@ -26,10 +26,14 @@ namespace Anvoker.Collections.Tests.Maps.MultiMap
         public static TestFixtureParameters[] GetFixtureArgs()
             => new TestFixtureParameters[]
             {
-                ConstructFixtureParams(MapTestDataSource.IntDecimal),
-                ConstructFixtureParams(MapTestDataSource.StringStringCaseInsensitive),
-                ConstructFixtureParams(MapTestDataSource.StringStringCaseSensitive),
-                ConstructFixtureParams(MapTestDataSource.ListType)
+                ConstructFixtureParams(
+                    MapTestDataSource.IntDecimal),
+                ConstructFixtureParams(
+                    MapTestDataSource.StringStringCaseInsensitive),
+                ConstructFixtureParams(
+                    MapTestDataSource.StringStringCaseSensitive),
+                ConstructFixtureParams(
+                    MapTestDataSource.ListType)
             };
 
         private static Func<MultiMap<TKey, TVal>> GetCtor<TKey, TVal>(
@@ -50,12 +54,17 @@ namespace Anvoker.Collections.Tests.Maps.MultiMap
         private static TestFixtureParameters ConstructFixtureParams<TKey, TVal>(
             MapTestData<TKey, TVal> data)
         {
+            var keyType = typeof(TKey);
+            var valType = typeof(TVal);
+            string testName
+                = $"{nameof(MultiMap<TKey, TVal>)} | {data.TestDataName}";
             return NestedIDictionaryMaps<TKey, TVal,
                 MultiMap<TKey, TVal>, ICollection<TVal>>
                 .ConstructFixtureParams(
                 GetCtor(data.KeysInitial, data.ValuesInitial),
                 (x) => new HashSet<TVal>(x),
-                data);
+                data,
+                testName);
         }
     }
 }

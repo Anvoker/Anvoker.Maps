@@ -15,6 +15,7 @@ namespace Anvoker.Collections.Tests.Maps
     {
         public static readonly MapTestData<int, decimal> IntDecimal
             = new MapTestData<int, decimal>(
+                testDataName: nameof(IntDecimal),
                 keysInitial: new int[] { 25, 37, 99, 20, -5 },
                 keysToAdd: new int[] { 900, 901, 525 },
                 keysExcluded: new int[] { 24, 2, -8 },
@@ -44,6 +45,7 @@ namespace Anvoker.Collections.Tests.Maps
         public static readonly
             MapTestData<string, string> StringStringCaseSensitive
             = new MapTestData<string, string>(
+                testDataName: nameof(StringStringCaseSensitive),
                 keysInitial: new string[] { "nyaa", "nyAA", "\"\"", string.Empty },
                 keysToAdd: new string[] { "meow", "meoW", "Meow" },
                 keysExcluded: new string[] { "NYAA", "NYaA", " " },
@@ -72,6 +74,7 @@ namespace Anvoker.Collections.Tests.Maps
         public static readonly
             MapTestData<string, string> StringStringCaseInsensitive
             = new MapTestData<string, string>(
+                testDataName: nameof(StringStringCaseInsensitive),
                 keysInitial: new string[]
                 {
                     "nyaa1", "nyaa2", string.Empty, "  "
@@ -103,6 +106,7 @@ namespace Anvoker.Collections.Tests.Maps
         public static readonly
             MapTestData<List<int>, Type> ListType
             = new MapTestData<List<int>, Type>(
+                testDataName: nameof(ListType),
                 keysInitial: new List<int>[]
                 {
                     new List<int>(),

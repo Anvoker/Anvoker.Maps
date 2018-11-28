@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Anvoker.Collections.Tests.Common.NestedIDictionary;
 using NUnit.Framework;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
-using Anvoker.Collections.Tests.Common.NestedIDictionary;
 
 #pragma warning disable IDE0034 // Simplify 'default' expression
 
@@ -27,6 +27,7 @@ namespace Anvoker.Collections.Tests.Maps.NestedIDictionary
     /// <see cref="IDictionary{TKey, TValue}"/>.</typeparam>
     /// <typeparam name="TValCol">Type of the nested collection used as the
     /// value type in <see cref="IDictionary{TKey, TValue}"/>.</typeparam>
+    [TestFixture(TestName = "Maps.NestedIDictionary")]
     [TestFixtureSource(
         typeof(SourceMap),
         nameof(SourceMap.TestFixtureSources))]

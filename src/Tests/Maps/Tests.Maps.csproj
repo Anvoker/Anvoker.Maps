@@ -46,7 +46,7 @@
     <Compile Include="MultiBiMap\NestedIDictionary_FixtureSource.cs" />
     <Compile Include="MultiMap\Constructors.cs" />
     <Compile Include="MultiMap\NestedIDictionary_FixtureSource.cs" />
-    <Compile Include="NestedIDictionary\NestedIDictionaryBase.cs" />
+    <Compile Include="NestedIDictionary\NestedIDictionaryMaps.cs" />
     <Compile Include="NestedIDictionary\SourceMap.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -15,6 +15,8 @@ namespace Anvoker.Collections.Tests.Common
         /// <see cref="MapTestData{TKey, TVal}"/> class using the specified
         /// keys, values and comparers.
         /// </summary>
+        /// <param name="testDataName">A string used to construct test names
+        /// later.</param>
         /// <param name="keysInitial">An array of keys initially contained
         /// in the collection.</param>
         /// <param name="keysToAdd">An array of keys to be added to the
@@ -32,6 +34,7 @@ namespace Anvoker.Collections.Tests.Common
         /// <param name="comparerValue">The comparer to use for value types.
         /// </param>
         public MapTestData(
+            string testDataName,
             TKey[] keysInitial,
             TKey[] keysToAdd,
             TKey[] keysExcluded,
@@ -41,6 +44,9 @@ namespace Anvoker.Collections.Tests.Common
             IEqualityComparer<TKey> comparerKey,
             IEqualityComparer<TVal> comparerValue)
         {
+            TestDataName = testDataName
+                ?? throw new ArgumentNullException(nameof(testDataName));
+
             KeysInitial = keysInitial
                 ?? throw new ArgumentNullException(nameof(keysInitial));
 
@@ -112,6 +118,7 @@ namespace Anvoker.Collections.Tests.Common
                 throw new ArgumentNullException(nameof(data));
             }
 
+            TestDataName = data.TestDataName;
             KeysInitial = data.KeysInitial;
             KeysToAdd = data.KeysToAdd;
             KeysExcluded = data.KeysExcluded;
@@ -121,6 +128,11 @@ namespace Anvoker.Collections.Tests.Common
             ComparerKey = data.ComparerKey;
             ComparerValue = data.ComparerValue;
         }
+
+        /// <summary>
+        /// Gets the name of this test data case.
+        /// </summary>
+        public string TestDataName { get; }
 
         /// <summary>
         /// Gets a unique set of keys.
