@@ -1,19 +1,19 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework.Interfaces;
 
-namespace Anvoker.Collections.Tests.NestedIDictionary
+namespace Anvoker.Collections.Tests.Maps.NestedIDictionary
 {
     /// <summary>
     /// Contains test fixture sources used to initialize the tests in
-    /// <see cref="NestedIDictionaryBase{TKey, TVal, TIDict, TValCol}"/>.
+    /// <see cref="NestedIDictionaryMaps{TKey, TVal, TIDict, TValCol}"/>.
     /// </summary>
     public static class SourceMap
     {
         private static readonly ITestFixtureData[][] testFixtureSources =
             new ITestFixtureData[][]
             {
-                MultiMapTests.NestedIDictionary_FixtureSource.GetFixtureArgs(),
-                MultiBiMapTests.NestedIDictionary_FixtureSource.GetFixtureArgs()
+                MultiMap.NestedIDictionary_FixtureSource.GetFixtureArgs(),
+                MultiBiMap.NestedIDictionary_FixtureSource.GetFixtureArgs()
             };
 
         /// <summary>

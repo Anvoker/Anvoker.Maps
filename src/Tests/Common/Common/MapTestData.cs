@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Anvoker.Collections.Tests
+namespace Anvoker.Collections.Tests.Common
 {
     /// <summary>
     /// Provides key, values and comparers appropriate for testing maps.

@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using Anvoker.Collections.Maps;
+using Anvoker.Collections.Tests.Common;
+using Anvoker.Collections.Tests.Maps.NestedIDictionary;
 
-namespace Anvoker.Collections.Tests.MultiMapTests
+namespace Anvoker.Collections.Tests.Maps.MultiMap
 {
-    using Anvoker.Collections.Maps;
-    using NestedIDictionary;
-
     /// <summary>
     /// Provides test data for a
     /// <see cref="NestedIDictionaryBase{TKey, TVal, TIDict, TValCol}"/> test
@@ -50,7 +50,7 @@ namespace Anvoker.Collections.Tests.MultiMapTests
         private static TestFixtureParameters ConstructFixtureParams<TKey, TVal>(
             MapTestData<TKey, TVal> data)
         {
-            return NestedIDictionaryBase<TKey, TVal,
+            return NestedIDictionaryMaps<TKey, TVal,
                 MultiMap<TKey, TVal>, ICollection<TVal>>
                 .ConstructFixtureParams(
                 GetCtor(data.KeysInitial, data.ValuesInitial),

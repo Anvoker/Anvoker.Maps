@@ -42,9 +42,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ExposedTestFixtureParams.cs" />
-    <Compile Include="HelperMethods.cs" />
-    <Compile Include="MapTestData.cs" />
     <Compile Include="MapTestDataSource.cs" />
     <Compile Include="MultiBiMap\NestedIDictionary_FixtureSource.cs" />
     <Compile Include="MultiMap\Constructors.cs" />
@@ -56,6 +53,10 @@
     <ProjectReference Include="..\..\Maps\Maps.csproj">
       <Project>{ca98f1be-e77b-4b55-9b87-4f4f6f7bf412}</Project>
       <Name>Maps</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Common\Common\Tests.Common.csproj">
+      <Project>{beab10ef-bd0d-4144-9ad0-d3bd1c052246}</Project>
+      <Name>Tests.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

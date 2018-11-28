@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using Anvoker.Collections.Maps;
+using Anvoker.Collections.Tests.Common;
+using Anvoker.Collections.Tests.Maps.NestedIDictionary;
 
-namespace Anvoker.Collections.Tests.MultiBiMapTests
+namespace Anvoker.Collections.Tests.Maps.MultiBiMap
 {
     using Anvoker.Collections.Maps;
     using NestedIDictionary;
@@ -50,7 +53,7 @@ namespace Anvoker.Collections.Tests.MultiBiMapTests
         private static TestFixtureParameters ConstructFixtureParams<TKey, TVal>(
             MapTestData<TKey, TVal> data)
         {
-            return NestedIDictionaryBase<TKey, TVal,
+            return NestedIDictionaryMaps<TKey, TVal,
                 MultiBiMap<TKey, TVal>, ICollection<TVal>>
                 .ConstructFixtureParams(
                 GetCtor(data.KeysInitial, data.ValuesInitial),
