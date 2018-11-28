@@ -1,0 +1,69 @@
+﻿<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <NoStandardLibraries>false</NoStandardLibraries>
+    <AssemblyName>Anvoker.Collections.Maps</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <RootNamespace>Anvoker.Collections.Maps</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BiMap.cs" />
+    <Compile Include="BiMap.KeyCollection.cs" />
+    <Compile Include="BiMap.ValueCollection.cs" />
+    <Compile Include="Interfaces\IBiMap.cs" />
+    <Compile Include="Interfaces\IFixedKeysBiMap.cs" />
+    <Compile Include="Interfaces\IFixedKeysMultiBiMap.cs" />
+    <Compile Include="Interfaces\IFixedKeysMultiMap.cs" />
+    <Compile Include="Interfaces\IMultiBiMap.cs" />
+    <Compile Include="Interfaces\IMultiMap.cs" />
+    <Compile Include="Interfaces\IReadOnlyBiMap.cs" />
+    <Compile Include="Interfaces\IReadOnlyMultiBiMap.cs" />
+    <Compile Include="Interfaces\IReadOnlyMultiMap.cs" />
+    <Compile Include="Interfaces\IValueSets.cs" />
+    <Compile Include="MultiBiMap.cs" />
+    <Compile Include="MultiBiMap.KeyCollection.cs" />
+    <Compile Include="MultiBiMap.ValueCollection.cs" />
+    <Compile Include="MultiMap.cs" />
+    <Compile Include="ValueSets.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSHARP.Targets" />
+  <ProjectExtensions>
+    <VisualStudio AllowExistingFolder="true" />
+  </ProjectExtensions>
+</Project>
