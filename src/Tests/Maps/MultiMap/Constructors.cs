@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using NUnit.Framework;
 
-namespace Anvoker.Tests.Collections.MultiMapTests
+namespace Anvoker.Collections.Tests.MultiMapTests
 {
     using Anvoker.Collections.Maps;
 

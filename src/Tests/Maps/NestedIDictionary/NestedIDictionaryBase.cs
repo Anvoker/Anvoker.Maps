@@ -7,7 +7,7 @@ using NUnit.Framework.Internal;
 
 #pragma warning disable IDE0034 // Simplify 'default' expression
 
-namespace Anvoker.Tests.Collections.NestedIDictionary
+namespace Anvoker.Collections.Tests.NestedIDictionary
 {
     /// <summary>
     /// Provides functionality for testing whether a class correctly implements

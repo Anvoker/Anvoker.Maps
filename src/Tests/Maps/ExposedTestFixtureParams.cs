@@ -1,7 +1,7 @@
 ﻿using System;
 using NUnit.Framework.Interfaces;
 
-namespace Anvoker.Tests.Collections
+namespace Anvoker.Collections.Tests
 {
     /// <summary>
     /// Has the sole purpose of easily allowing us to create an instance of

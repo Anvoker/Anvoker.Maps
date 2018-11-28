@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using NUnit.Framework.Interfaces;
 
-namespace Anvoker.Tests.Collections.NestedIDictionary
+namespace Anvoker.Collections.Tests.NestedIDictionary
 {
     /// <summary>
     /// Contains test fixture sources used to initialize the tests in

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Anvoker.Tests.Collections
+namespace Anvoker.Collections.Tests
 {
     // TODO: Break this static class into less nondescript static classes once
     // there are enough methods to justify their existence. Having "misc"

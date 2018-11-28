@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace Anvoker.Tests.Collections.MultiMapTests
+namespace Anvoker.Collections.Tests.MultiMapTests
 {
     using Anvoker.Collections.Maps;
     using NestedIDictionary;
