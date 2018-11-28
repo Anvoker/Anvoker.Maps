@@ -5,9 +5,14 @@ VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Anvoker.Collections", "Anvoker.Collections.csproj", "{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Anvoker.Collections.Tests\Tests.csproj", "{32303BA1-931C-459C-B90D-CF950F4C786B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{32303BA1-931C-459C-B90D-CF950F4C786B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412} = {CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{6F692D0E-9232-4258-8FBD-182D33F8694C}"
+	ProjectSection(SolutionItems) = preProject
+		Anvoker.Collections.sln.vsspell = Anvoker.Collections.sln.vsspell
 	EndProjectSection
 EndProject
 Global
