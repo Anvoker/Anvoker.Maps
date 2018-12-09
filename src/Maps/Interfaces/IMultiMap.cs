@@ -51,25 +51,25 @@ namespace Anvoker.Collections.Maps
         void AddKey(TKey key, IEnumerable<TVal> values);
 
         /// <summary>
-        /// Adds the value to the specified key in the
+        /// Adds the value to an existing specified key in the
         /// <see cref="IMultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element.</param>
         /// <param name="value">The value to add to the element. The value can
         /// be null for reference types.</param>
-        /// <returns>true if the value didn't exist already; otherwise,
-        /// false.</returns>
+        /// <returns>true if the key was found and the value didn't exist
+        /// already; otherwise, false.</returns>
         bool AddValue(TKey key, TVal value);
 
         /// <summary>
-        /// Adds the values to the specified key in the
+        /// Adds the values to an existing specified key in the
         /// <see cref="IMultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element.</param>
         /// <param name="values">The values to add to the element. The value can
         /// be null for reference types.</param>
-        /// <returns>true if at least one value didn't exist already and was
-        /// added; otherwise, false.</returns>
+        /// <returns>true if the key was found and at least one value didn't
+        /// exist already; otherwise, false.</returns>
         bool AddValues(TKey key, IEnumerable<TVal> values);
 
         /// <summary>
@@ -96,7 +96,21 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the <see cref="IMultiMap{TKey, TVal}"/> contains
         /// an element with the specified key and value; otherwise, false.
         /// </returns>
-        bool ContainsValue(TKey key, TVal value);
+        bool ContainsKeyWithValue(TKey key, TVal value);
+
+        /// <summary>
+        /// Determines whether the <see cref="IMultiMap{TKey, TVal}"/> contains
+        /// all of the specified values at the specified key.
+        /// </summary>
+        /// <param name="key">The key to locate in the
+        /// <see cref="IMultiMap{TKey, TVal}"/>.</param>
+        /// <param name="values">The values to locate in the
+        /// <see cref="IMultiMap{TKey, TVal}"/>. The value can be null for
+        /// reference types.</param>
+        /// <returns>true if the <see cref="IMultiMap{TKey, TVal}"/> contains
+        /// an element with the specified key and values; otherwise, false.
+        /// </returns>
+        bool ContainsKeyWithValues(TKey key, IEnumerable<TVal> values);
 
         /// <summary>
         /// Removes the element with the specified key from the

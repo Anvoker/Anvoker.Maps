@@ -81,6 +81,6 @@ namespace Anvoker.Collections.Maps
         /// </summary>
         /// <param name="key">The key of the value to replace.</param>
         /// <param name="value">The new value.</param>
-        void Replace(TKey key, TVal value);
+        bool Replace(TKey key, TVal value);
     }
 }

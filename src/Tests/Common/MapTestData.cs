@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace Anvoker.Collections.Tests.Common
 {
@@ -44,65 +45,16 @@ namespace Anvoker.Collections.Tests.Common
             IEqualityComparer<TKey> comparerKey,
             IEqualityComparer<TVal> comparerValue)
         {
-            TestDataName = testDataName
-                ?? throw new ArgumentNullException(nameof(testDataName));
-
-            KeysInitial = keysInitial
-                ?? throw new ArgumentNullException(nameof(keysInitial));
-
-            KeysToAdd = keysToAdd
-                ?? throw new ArgumentNullException(nameof(keysToAdd));
-
-            KeysExcluded = keysExcluded
-                ?? throw new ArgumentNullException(nameof(keysExcluded));
-
-            ValuesInitial = valuesInitial
-                ?? throw new ArgumentNullException(nameof(valuesInitial));
-
-            ValuesToAdd = valuesToAdd
-                ?? throw new ArgumentNullException(nameof(valuesToAdd));
-
-            ValuesExcluded = valuesExcluded
-                ?? throw new ArgumentNullException(nameof(valuesExcluded));
-
+            TestDataName = testDataName;
+            KeysInitial = keysInitial;
+            KeysToAdd = keysToAdd;
+            KeysExcluded = keysExcluded;
+            ValuesInitial = valuesInitial;
+            ValuesToAdd = valuesToAdd;
+            ValuesExcluded = valuesExcluded;
             ComparerKey = comparerKey ?? EqualityComparer<TKey>.Default;
             ComparerValue = comparerValue ?? EqualityComparer<TVal>.Default;
-
-            HasDuplicatesThrow(keysInitial, nameof(keysInitial), ComparerKey);
-            HasDuplicatesThrow(keysToAdd, nameof(keysToAdd), ComparerKey);
-            HasDuplicatesThrow(keysExcluded, nameof(keysExcluded), ComparerKey);
-
-            LengthDiffersThrow(
-                keysInitial,
-                valuesInitial,
-                nameof(keysInitial),
-                nameof(valuesInitial));
-
-            LengthDiffersThrow(
-                keysToAdd,
-                valuesToAdd,
-                nameof(keysToAdd),
-                nameof(valuesToAdd));
-
-            LengthDiffersThrow(
-                keysExcluded,
-                valuesExcluded,
-                nameof(keysExcluded),
-                nameof(valuesExcluded));
-
-            HasOverlapThrow(
-                keysInitial,
-                keysToAdd,
-                nameof(keysInitial),
-                nameof(keysToAdd),
-                ComparerKey);
-
-            HasOverlapThrow(
-                keysInitial,
-                keysExcluded,
-                nameof(keysInitial),
-                nameof(keysExcluded),
-                ComparerKey);
+            KeyIsNullabe = default(TKey) == null;
         }
 
         /// <summary>
@@ -125,8 +77,9 @@ namespace Anvoker.Collections.Tests.Common
             ValuesInitial = data.ValuesInitial;
             ValuesToAdd = data.ValuesToAdd;
             ValuesExcluded = data.ValuesExcluded;
-            ComparerKey = data.ComparerKey;
-            ComparerValue = data.ComparerValue;
+            ComparerKey = data.ComparerKey ?? EqualityComparer<TKey>.Default;
+            ComparerValue = data.ComparerValue ?? EqualityComparer<TVal>.Default;
+            KeyIsNullabe = default(TKey) == null;
         }
 
         /// <summary>
@@ -177,43 +130,9 @@ namespace Anvoker.Collections.Tests.Common
         /// </summary>
         public IEqualityComparer<TVal> ComparerValue { get; }
 
-        private static void HasOverlapThrow(
-            TKey[] arr1,
-            TKey[] arr2,
-            string name1,
-            string name2,
-            IEqualityComparer<TKey> comparer)
-        {
-            if (new HashSet<TKey>(arr1, comparer).Overlaps(
-                new HashSet<TKey>(arr2, comparer)))
-            {
-                throw new ArgumentException($"{name1} and {name2} can't have " +
-                    "any keys in common.");
-            }
-        }
-
-        private static void LengthDiffersThrow(
-            TKey[] arr1, TVal[][] arr2, string name1, string name2)
-        {
-            if (arr1.Length != arr2.Length)
-            {
-                throw new ArgumentException(
-                    $"{name1} and {name2} must have equal length.");
-            }
-        }
-
-        private static void HasDuplicatesThrow(
-            TKey[] array, string name, IEqualityComparer<TKey> comparer)
-        {
-            var hashset = new HashSet<TKey>(comparer);
-            foreach (TKey item in array)
-            {
-                if (!hashset.Add(item))
-                {
-                    throw new ArgumentException($"{name} must have no " +
-                        "duplicate keys.");
-                }
-            }
-        }
+        /// <summary>
+        /// Gets a value indicating whether the key is of a nullable type.
+        /// </summary>
+        public bool KeyIsNullabe { get; }
     }
 }

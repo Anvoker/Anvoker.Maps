@@ -2,18 +2,17 @@
 using System.Collections.Generic;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common;
-using Anvoker.Collections.Tests.Maps.NestedIDictionary;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 
-namespace Anvoker.Collections.Tests.Maps.MultiMap
+namespace Anvoker.Collections.Tests.Maps.MultiBiMap
 {
     /// <summary>
     /// Provides test data for a
-    /// <see cref="NestedIDictionaryBase{TKey, TVal, TIDict, TValCol}"/> test
+    /// <see cref="IDictionaryNestedBase{TKey, TVal, TIDict, TValCol}"/> test
     /// fixture.
     /// </summary>
-    public static class NestedIDictionary_FixtureSource
+    public static class IDictionaryNested_FixtureSource
     {
         /// <summary>
         /// Provides the arguments for a test fixture that is decorated with
@@ -36,12 +35,17 @@ namespace Anvoker.Collections.Tests.Maps.MultiMap
                     MapTestDataSource.ListType)
             };
 
-        private static Func<MultiMap<TKey, TVal>> GetCtor<TKey, TVal>(
-            TKey[] keys, TVal[][] values)
+        private static Func<MultiBiMap<TKey, TVal>> GetCtor<TKey, TVal>(
+            TKey[] keys,
+            TVal[][] values,
+            IEqualityComparer<TKey> comparerKey,
+            IEqualityComparer<TVal> comparerVal)
         {
             return () =>
             {
-                var multiMap = new MultiMap<TKey, TVal>();
+                var multiMap = new MultiBiMap<TKey, TVal>(
+                    comparerKey,
+                    comparerVal);
                 for (int i = 0; i < keys.Length; i++)
                 {
                     multiMap.Add(keys[i], values[i]);
@@ -56,13 +60,18 @@ namespace Anvoker.Collections.Tests.Maps.MultiMap
         {
             var keyType = typeof(TKey);
             var valType = typeof(TVal);
+            var ctor = GetCtor(
+                data.KeysInitial,
+                data.ValuesInitial,
+                data.ComparerKey,
+                data.ComparerValue);
             string testName
-                = $"{nameof(MultiMap<TKey, TVal>)} | {data.TestDataName}";
-            return NestedIDictionaryMaps<TKey, TVal,
-                MultiMap<TKey, TVal>, ICollection<TVal>>
+                = $"{nameof(MultiBiMap<TKey, TVal>)} | {data.TestDataName}";
+            return IDictionaryNestedBase<TKey, TVal,
+                MultiBiMap<TKey, TVal>, ICollection<TVal>>
                 .ConstructFixtureParams(
-                GetCtor(data.KeysInitial, data.ValuesInitial),
-                (x) => new HashSet<TVal>(x),
+                ctor,
+                (x) => new HashSet<TVal>(x, data.ComparerValue),
                 data,
                 testName);
         }

@@ -35,9 +35,9 @@ namespace Anvoker.Collections.Tests.Maps
                 },
                 valuesExcluded: new decimal[][]
                 {
-                    new decimal[] { 5.25m, 0.0m },
+                    new decimal[] { 0.55m, 0.777m },
                     new decimal[] { },
-                    new decimal[] { 5.25m, 0.0m, 25.0m },
+                    new decimal[] { 0.025m, 999.9m, 99.0m },
                 },
                 comparerKey: null,
                 comparerValue: null);
@@ -64,9 +64,9 @@ namespace Anvoker.Collections.Tests.Maps
                 },
                 valuesExcluded: new string[][]
                 {
-                    new string[] { "aaaa" },
+                    new string[] { "acde" },
                     new string[] { },
-                    new string[] { "zzzz", "\"\"", "wwww" },
+                    new string[] { "acde", "\"\"", "wwww" },
                 },
                 comparerKey: StringComparer.InvariantCulture,
                 comparerValue: StringComparer.InvariantCulture);
@@ -96,7 +96,7 @@ namespace Anvoker.Collections.Tests.Maps
                 },
                 valuesExcluded: new string[][]
                 {
-                    new string[] { "aaaa" },
+                    new string[] { "acde" },
                     new string[] { },
                     new string[] { "zzzz", "\"\"", "wwww" },
                 },
@@ -141,7 +141,7 @@ namespace Anvoker.Collections.Tests.Maps
                 },
                 valuesExcluded: new Type[][]
                 {
-                    new Type[] { typeof(int) },
+                    new Type[] { typeof(long) },
                     new Type[] { },
                     new Type[] { typeof(DateTime) },
                 },

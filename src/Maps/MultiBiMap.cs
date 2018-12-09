@@ -611,8 +611,23 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the <see cref="MultiBiMap{TKey, TVal}"/> contains
         /// an element with the specified key and value; otherwise, false.
         /// </returns>
-        public bool ContainsValue(TKey key, TVal value)
+        public bool ContainsKeyWithValue(TKey key, TVal value)
             => dictFwd.ContainsKey(key) && dictFwd[key].Contains(value);
+
+        /// <summary>
+        /// Determines whether the <see cref="MultiBiMap{TKey, TVal}"/> contains
+        /// all of the specified values at the specified key.
+        /// </summary>
+        /// <param name="key">The key to locate in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>.</param>
+        /// <param name="values">The values to locate in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>. The value can be null for
+        /// reference types.</param>
+        /// <returns>true if the <see cref="MultiMap{TKey, TVal}"/> contains
+        /// an element with the specified key and values; otherwise, false.
+        /// </returns>
+        public bool ContainsKeyWithValues(TKey key, IEnumerable<TVal> values)
+            => dictFwd.ContainsKey(key) && dictFwd[key].SetEquals(values);
 
         /// <summary>
         /// Determines whether the <see cref="MultiBiMap{TKey, TVal}"/> contains

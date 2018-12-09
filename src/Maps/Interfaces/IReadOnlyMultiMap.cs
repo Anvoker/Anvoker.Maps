@@ -49,6 +49,6 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the <see cref="IReadOnlyMultiMap{TKey, TVal}"/>
         /// contains an element with the specified key and value; otherwise,
         /// false.</returns>
-        bool ContainsValue(TKey key, TVal value);
+        bool ContainsKeyWithValue(TKey key, TVal value);
     }
 }

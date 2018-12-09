@@ -390,11 +390,7 @@ namespace Anvoker.Collections.Maps
         /// <param name="value">The value of the element to add. The value can
         /// be null for reference types.</param>
         public void AddKey(TKey key, TVal value)
-        {
-#pragma warning disable IDE0022 // Use expression body for methods
-            multiDict.Add(key, new HashSet<TVal>(ComparerValue) { value });
-#pragma warning restore IDE0022 // Use expression body for methods
-        }
+            => multiDict.Add(key, new HashSet<TVal>(ComparerValue) { value });
 
         /// <summary>
         /// Adds the specified key and its associated values to the
@@ -430,60 +426,49 @@ namespace Anvoker.Collections.Maps
         }
 
         /// <summary>
-        /// Adds the value to the specified key in the
+        /// Adds the value to an existing specified key in the
         /// <see cref="MultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element.</param>
-        /// <param name="value">The values to add to the element. The value can
+        /// <param name="value">The value to add to the element. The value can
         /// be null for reference types.</param>
-        /// <returns>true if the value didn't exist already; otherwise,
-        /// false.</returns>
+        /// <returns>true if the key was found and the value didn't exist
+        /// already; otherwise, false.</returns>
         public bool AddValue(TKey key, TVal value)
         {
-            try
+            if (key == null)
             {
-                return multiDict[key].Add(value);
+                throw new
+                    ArgumentNullException(nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
-            }
+            return ContainsKey(key) && multiDict[key].Add(value);
         }
 
         /// <summary>
-        /// Adds the values to the specified key in the
+        /// Adds the values to an existing specified key in the
         /// <see cref="MultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element.</param>
-        /// <param name="values">The values to add to the element.</param>
-        /// <returns>true if at least one value didn't exist already and was
-        /// added; otherwise, false.</returns>
+        /// <param name="values">The values to add to the element. The value can
+        /// be null for reference types.</param>
+        /// <returns>true if the key was found and at least one value didn't
+        /// exist already; otherwise, false.</returns>
         public bool AddValues(TKey key, IEnumerable<TVal> values)
         {
+            if (key == null)
+            {
+                throw new
+                    ArgumentNullException(nameof(key), "Keys cannot be null.");
+            }
+
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
             }
 
             bool atLeastOneValueAdded = false;
-            HashSet<TVal> hashSetValues = null;
-
-            try
-            {
-                hashSetValues = multiDict[key];
-            }
-            catch (ArgumentNullException)
-            {
-                throw new ArgumentNullException(
-                    nameof(key), "Keys cannot be null.");
-            }
-
+            HashSet<TVal> hashSetValues = multiDict[key];
             foreach (TVal value in values)
             {
                 atLeastOneValueAdded |= hashSetValues.Add(value);
@@ -522,8 +507,23 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the <see cref="MultiMap{TKey, TVal}"/> contains
         /// an element with the specified key and value; otherwise, false.
         /// </returns>
-        public bool ContainsValue(TKey key, TVal value)
+        public bool ContainsKeyWithValue(TKey key, TVal value)
             => multiDict.ContainsKey(key) && multiDict[key].Contains(value);
+
+        /// <summary>
+        /// Determines whether the <see cref="MultiMap{TKey, TVal}"/> contains
+        /// all of the specified values at the specified key.
+        /// </summary>
+        /// <param name="key">The key to locate in the
+        /// <see cref="MultiMap{TKey, TVal}"/>.</param>
+        /// <param name="values">The values to locate in the
+        /// <see cref="MultiMap{TKey, TVal}"/>. The value can be null for
+        /// reference types.</param>
+        /// <returns>true if the <see cref="MultiMap{TKey, TVal}"/> contains
+        /// an element with the specified key and values; otherwise, false.
+        /// </returns>
+        public bool ContainsKeyWithValues(TKey key, IEnumerable<TVal> values)
+            => multiDict.ContainsKey(key) && multiDict[key].SetEquals(values);
 
         /// <summary>
         /// Determines whether the <see cref="MultiMap{TKey, TVal}"/> contains
