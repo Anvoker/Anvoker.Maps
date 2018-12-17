@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Linq;
-using Anvoker.Collections.Tests.Common;
 using System.Reflection;
+using System.Text;
+using Anvoker.Collections.Tests.Common;
 using NUnit.Framework;
 
 namespace Anvoker.Collections.Tests.Maps
@@ -11,15 +11,15 @@ namespace Anvoker.Collections.Tests.Maps
     [TestFixture]
     public class MapTestDataSourceValidator
     {
-        private readonly static MethodInfo validateMethodUnbound =
+        private static readonly MethodInfo validateMethodUnbound =
                 typeof(MapTestDataSourceValidator).GetMethod(
                 nameof(Validate),
                 BindingFlags.NonPublic | BindingFlags.Static);
 
-        private readonly static Type genericMap
+        private static readonly Type genericMap
             = typeof(MapTestData<,>).GetGenericTypeDefinition();
 
-        private readonly static FieldInfo[] fields
+        private static readonly FieldInfo[] fields
             = typeof(MapTestDataSource).GetFields(
                 BindingFlags.Static | BindingFlags.Public);
 

@@ -43,9 +43,9 @@ namespace Anvoker.Collections.Tests.Maps
                 comparerValue: null);
 
         public static readonly
-            MapTestData<string, string> StringStringCaseSensitive
+            MapTestData<string, string> StringStringSensitive
             = new MapTestData<string, string>(
-                testDataName: nameof(StringStringCaseSensitive),
+                testDataName: nameof(StringStringSensitive),
                 keysInitial: new string[] { "nyaa", "nyAA", "\"\"", string.Empty },
                 keysToAdd: new string[] { "meow", "meoW", "Meow" },
                 keysExcluded: new string[] { "NYAA", "NYaA", " " },
@@ -72,9 +72,9 @@ namespace Anvoker.Collections.Tests.Maps
                 comparerValue: StringComparer.InvariantCulture);
 
         public static readonly
-            MapTestData<string, string> StringStringCaseInsensitive
+            MapTestData<string, string> StringStringInsensitive
             = new MapTestData<string, string>(
-                testDataName: nameof(StringStringCaseInsensitive),
+                testDataName: nameof(StringStringInsensitive),
                 keysInitial: new string[]
                 {
                     "nyaa1", "nyaa2", string.Empty, "  "
@@ -104,9 +104,9 @@ namespace Anvoker.Collections.Tests.Maps
                 comparerValue: StringComparer.InvariantCultureIgnoreCase);
 
         public static readonly
-            MapTestData<List<int>, Type> ListType
+            MapTestData<List<int>, Type> ListIntType
             = new MapTestData<List<int>, Type>(
-                testDataName: nameof(ListType),
+                testDataName: nameof(ListIntType),
                 keysInitial: new List<int>[]
                 {
                     new List<int>(),

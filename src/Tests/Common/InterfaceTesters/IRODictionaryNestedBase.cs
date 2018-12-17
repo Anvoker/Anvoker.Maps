@@ -20,7 +20,7 @@ namespace Anvoker.Collections.Tests.Common
     /// <see cref="IReadOnlyDictionary{TKey, TValue}"/>.</typeparam>
     /// <typeparam name="TValCol">Type of the nested collection used as the
     /// value type in <see cref="IDictionary{TKey, TValue}"/>.</typeparam>
-    public class IReadOnlyDictionaryNestedBase<TKey, TVal, TIDict, TValCol> :
+    public class IRODictionaryNestedBase<TKey, TVal, TIDict, TValCol> :
         MapTestDataConstructible<TKey, TVal, TIDict, TValCol>
         where TIDict : IReadOnlyDictionary<TKey, TValCol>
         where TValCol : IEnumerable<TVal>
@@ -40,7 +40,7 @@ namespace Anvoker.Collections.Tests.Common
         /// </summary>
         /// <param name="args">A data class containing all of the necessary
         /// arguments for initializing the tests.</param>
-        public IReadOnlyDictionaryNestedBase(
+        public IRODictionaryNestedBase(
             MapTestDataConcrete<TKey, TVal, TIDict, TValCol> args)
         {
             d = args;

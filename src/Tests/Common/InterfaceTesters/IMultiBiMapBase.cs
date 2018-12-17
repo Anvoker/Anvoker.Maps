@@ -53,7 +53,9 @@ namespace Anvoker.Collections.Tests.Common
                 (x, y, ignoreEmpty) => x.GetKeysWithSubset(y, ignoreEmpty),
                 (x, y, ignoreEmpty) => x.GetKeysWithSuperset(y, ignoreEmpty),
                 (x, y, ignoreEmpty) => x.GetKeysWithEqualSet(y, ignoreEmpty),
+#pragma warning disable RCS1163 // Unused parameter.
                 (x, y, ignoreEmpty) => x.GetKeysWithAny(y)
+#pragma warning restore RCS1163 // Unused parameter.
             };
 
         private static readonly string[] SelectorNames = new string[]
@@ -64,7 +66,9 @@ namespace Anvoker.Collections.Tests.Common
             "Any"
         };
 
+#pragma warning disable RCS1158 // Static member in generic type should use a type parameter.
         public static IEnumerable<TestCaseData> SelectorCases
+#pragma warning restore RCS1158 // Static member in generic type should use a type parameter.
         {
             get
             {

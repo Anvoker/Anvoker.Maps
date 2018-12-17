@@ -6,11 +6,11 @@ using NUnit.Framework;
 namespace Anvoker.Collections.Tests.Maps.IMultiMap
 {
     [TestFixtureSource(
-        typeof(MultiBiMap.IMultiMap_FixtureSource),
-        nameof(MultiBiMap.IMultiMap_FixtureSource.GetFixtureArgs))]
+        typeof(MultiBiMap.FixtureSource_IMultiMap),
+        nameof(MultiBiMap.FixtureSource_IMultiMap.GetArgs))]
     [TestFixtureSource(
-        typeof(MultiMap.IMultiMap_FixtureSource),
-        nameof(MultiMap.IMultiMap_FixtureSource.GetFixtureArgs))]
+        typeof(MultiMap.FixtureSource_IMultiMap),
+        nameof(MultiMap.FixtureSource_IMultiMap.GetArgs))]
     public class ForwardingFixture<TKey, TVal, TMultiMap, TValCol>
         : IMultiMapBase<TKey, TVal, TMultiMap, TValCol>
         where TMultiMap : IMultiMap<TKey, TVal>

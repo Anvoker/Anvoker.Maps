@@ -24,7 +24,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -51,10 +51,9 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MapTestDataExtensionMethods.cs" />
-    <Compile Include="MapTestDataFixtureParametersConstructor.cs" />
+    <Compile Include="Tracing.cs" />
     <Compile Include="MapTestDataConstructible.cs" />
-    <Compile Include="InterfaceTesters\IReadOnlyDictionaryNestedBase.cs" />
+    <Compile Include="InterfaceTesters\IRODictionaryNestedBase.cs" />
     <Compile Include="InterfaceTesters\IMultiBiMapBase.cs" />
     <Compile Include="MapTestDataConcrete.cs" />
     <Compile Include="InterfaceTesters\IMultiMapBase.cs" />

@@ -9,17 +9,23 @@ namespace Anvoker.Collections.Tests.Common
         : IMapTestDataConstructible
     {
         public static TestFixtureParameters
-            ConstructFixtureParams(
-            Func<TIDict> ctorImplementor,
-            Func<IEnumerable<TVal>, TValCol> ctorTValCol,
+            MakeFixtureParams(
+            Func<MapTestData<TKey, TVal>, TIDict> ctorImplementor,
+            Func<IEnumerable<TVal>, IEqualityComparer<TVal>, TValCol> ctorValCol,
             MapTestData<TKey, TVal> data,
-            string testName)
+            string concreteTypeName)
         {
+            TIDict pAppCtorImplementor()
+                => ctorImplementor(data);
+
+            TValCol pAppCtorValCol(IEnumerable<TVal> x)
+                => ctorValCol(x, data.ComparerValue);
+
             var args = new MapTestDataConcrete<TKey, TVal, TIDict, TValCol>(
-                ctorImplementor, ctorTValCol, data);
+                pAppCtorImplementor, pAppCtorValCol, data);
             var exposedParams = new ExposedTestFixtureParams()
             {
-                TestName = testName,
+                TestName = $"{concreteTypeName} | {data.TestDataName}",
                 Arguments = new object[] { args },
                 Properties = new PropertyBag(),
                 RunState = RunState.Runnable,
@@ -36,5 +42,6 @@ namespace Anvoker.Collections.Tests.Common
         }
     }
 
-    public interface IMapTestDataConstructible { }
+    public interface IMapTestDataConstructible
+    { }
 }

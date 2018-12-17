@@ -6,8 +6,8 @@ using NUnit.Framework;
 namespace Anvoker.Collections.Tests.Maps.IMultiBiMap
 {
     [TestFixtureSource(
-        typeof(MultiBiMap.IMultiBiMap_FixtureSource),
-        nameof(MultiBiMap.IMultiBiMap_FixtureSource.GetFixtureArgs))]
+        typeof(MultiBiMap.FixtureSource_IMultiBiMap),
+        nameof(MultiBiMap.FixtureSource_IMultiBiMap.GetArgs))]
     public class ForwardingFixture_IMultiBiMap<TKey, TVal, TMultiBiMap, TValCol>
         : IMultiBiMapBase<TKey, TVal, TMultiBiMap, TValCol>
         where TMultiBiMap : IMultiBiMap<TKey, TVal>

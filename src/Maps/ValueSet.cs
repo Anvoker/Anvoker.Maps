@@ -6,19 +6,15 @@ using System.Linq;
 
 namespace Anvoker.Collections.Maps
 {
-    public interface ISetPlus<T> : ISet<T>
-    {
-        bool Add(IEnumerable<T> item);
-        bool Remove(IEnumerable<T> item);
-    }
-
     /// <summary>
     /// Represents a set of values used in a collection.
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TVal"></typeparam>
+    /// <typeparam name="TKey">The type of the keys.
+    /// </typeparam>
+    /// <typeparam name="TVal">The type of the values.
+    /// </typeparam>
     public class ValueSet<TKey, TVal> :
-        ISetPlus<TVal>,
+        ISet<TVal>,
         IReadOnlyCollection<TVal>
     {
         #region Public Constructors
@@ -61,6 +57,7 @@ namespace Anvoker.Collections.Maps
         public bool IsReadOnly => false;
 
         public TKey Key { get; }
+
         public IMultiMap<TKey, TVal> Parent { get; }
 
         public int Count => HashSet.Count;
@@ -120,9 +117,6 @@ namespace Anvoker.Collections.Maps
         bool ISet<TVal>.Add(TVal item)
             => Parent.AddValue(Key, item);
 
-        bool ISetPlus<TVal>.Add(IEnumerable<TVal> item)
-            => Parent.AddValues(Key, item);
-
         void ICollection<TVal>.Add(TVal item)
             => Parent.AddValue(Key, item);
 
@@ -141,9 +135,6 @@ namespace Anvoker.Collections.Maps
 
         bool ICollection<TVal>.Remove(TVal item)
             => Parent.RemoveValue(Key, item);
-
-        bool ISetPlus<TVal>.Remove(IEnumerable<TVal> item)
-            => Parent.RemoveValues(Key, item);
 
         void ISet<TVal>.SymmetricExceptWith(IEnumerable<TVal> other)
         {

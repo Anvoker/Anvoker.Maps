@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\bin\Debug\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -48,7 +48,6 @@
     <Compile Include="Interfaces\IReadOnlyBiMap.cs" />
     <Compile Include="Interfaces\IReadOnlyMultiBiMap.cs" />
     <Compile Include="Interfaces\IReadOnlyMultiMap.cs" />
-    <Compile Include="Interfaces\IValueSets.cs" />
     <Compile Include="MultiBiMap.cs" />
     <Compile Include="MultiMap.cs" />
     <Compile Include="ValueSet.cs" />

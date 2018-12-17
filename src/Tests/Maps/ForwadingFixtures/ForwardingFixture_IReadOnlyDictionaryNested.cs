@@ -5,13 +5,13 @@ using NUnit.Framework;
 namespace Anvoker.Collections.Tests.Maps.IReadOnlyDictionaryNested
 {
     [TestFixtureSource(
-        typeof(MultiBiMap.IReadOnlyDictionaryNested_FixtureSource),
-        nameof(MultiBiMap.IReadOnlyDictionaryNested_FixtureSource.GetFixtureArgs))]
+        typeof(MultiBiMap.FixtureSource_IRODictionaryNested),
+        nameof(MultiBiMap.FixtureSource_IRODictionaryNested.GetArgs))]
     [TestFixtureSource(
-        typeof(MultiMap.IReadOnlyDictionaryNested_FixtureSource),
-        nameof(MultiMap.IReadOnlyDictionaryNested_FixtureSource.GetFixtureArgs))]
+        typeof(MultiMap.FixtureSource_IRODictionaryNested),
+        nameof(MultiMap.FixtureSource_IRODictionaryNested.GetArgs))]
     public class ForwardingFixture<TKey, TVal, TIDict, TValCol>
-        : IReadOnlyDictionaryNestedBase<TKey, TVal, TIDict, TValCol>
+        : IRODictionaryNestedBase<TKey, TVal, TIDict, TValCol>
         where TIDict : IReadOnlyDictionary<TKey, TValCol>
         where TValCol : IEnumerable<TVal>
     {

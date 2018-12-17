@@ -220,8 +220,10 @@ namespace Anvoker.Collections.Tests.Common
             var enumerator = second.GetEnumerator();
             for (int i = 0; i < first.Length; i++, enumerator.MoveNext())
             {
-                var union = new List<TValue>(first[i]);
-                union.Add(enumerator.Current);
+                var union = new List<TValue>(first[i])
+                {
+                    enumerator.Current
+                };
                 values[i] = collectionConstructor(union);
             }
 
