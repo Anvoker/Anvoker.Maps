@@ -19,6 +19,18 @@ namespace Anvoker.Collections.Tests.Common
     /// </summary>
     public static class HelperMethods
     {
+        public enum MsgKeys
+        {
+            NullableSkip
+        }
+
+        public readonly static Dictionary<MsgKeys, string>
+            AssertMsgs =
+            new Dictionary<MsgKeys, string>()
+            {
+                { MsgKeys.NullableSkip, "The key is not nullable, so this test is not applicable." }
+            };
+
         /// <summary>
         /// Pretty prints a key-value pair.
         /// </summary>
@@ -107,7 +119,7 @@ namespace Anvoker.Collections.Tests.Common
             int i = 0;
             foreach (object arg in args)
             {
-                if (toStringMethods != null && toStringMethods[i] != null)
+                if (toStringMethods?[i] != null)
                 {
                     sb.Append(toStringMethods[i](arg)).Append(delimiter);
                 }

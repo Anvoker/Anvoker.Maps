@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #pragma warning disable RCS1169 // Mark field as read-only.
-#pragma warning disable RCS1227 // Validate arguments correctly.
-#pragma warning disable RCS1220 // Use pattern matching instead of combination of 'is' operator and cast operator.
-#pragma warning disable IDE0020 // Use pattern matching
-#pragma warning disable IDE0034 // Simplify 'default' expression
-#pragma warning disable IDE0027 // Use expression body for accessors
 
 namespace Anvoker.Collections.Maps
 {
@@ -20,37 +16,21 @@ namespace Anvoker.Collections.Maps
     /// </typeparam>
     /// <typeparam name="TVal">The type of the values.
     /// </typeparam>
-    public partial class MultiBiMap<TKey, TVal> : IMultiBiMap<TKey, TVal>,
-        IReadOnlyMultiBiMap<TKey, TVal>, IFixedKeysMultiBiMap<TKey, TVal>
+    public partial class MultiBiMap<TKey, TVal> : IMultiBiMap<TKey, TVal>
     {
         #region Private Fields
 
-        private Dictionary<TKey, HashSet<TVal>> dictFwd;
-        private Dictionary<HashSet<TVal>, TKey> dictRev;
-        private Dictionary<TVal, HashSet<TKey>> dictRevFlat;
-
-        private KeyCollection keyCollection;
-        private ValueCollection valueCollection;
-
         private IEqualityComparer<TKey> comparerKey;
         private IEqualityComparer<TVal> comparerValue;
-
-        /// <summary>
-        /// Keeps track of how often a value occurs in the multimap.
-        /// </summary>
-        private Dictionary<TVal, int> dictValOccurance;
+        private Dictionary<TKey, ValueSet<TKey, TVal>> dictFwd;
+        private Dictionary<ValueSet<TKey, TVal>, TKey> dictRev;
+        private Dictionary<TVal, HashSet<TKey>> dictRevFlat;
 
         /// <summary>
         /// Holds all of the keys that are associated with null values. We need
         /// it because <see cref="dictRevFlat"/> cannot hold null as keys.
         /// </summary>
         private HashSet<TKey> keysWithNullValue;
-
-        /// <summary>
-        /// Keeps track of how often null occurs as a value in the multimap.
-        /// This is needed because dictionaries can't hold null as keys.
-        /// </summary>
-        private int nullValOccurance;
 
         #endregion Private Fields
 
@@ -128,9 +108,9 @@ namespace Anvoker.Collections.Maps
                     nameof(capacity), "Capacity cannot be less than zero.");
             }
 
-            dictFwd = new Dictionary<TKey, HashSet<TVal>>(
+            dictFwd = new Dictionary<TKey, ValueSet<TKey, TVal>>(
                 capacity, comparerKey);
-            dictRev = new Dictionary<HashSet<TVal>, TKey>(capacity);
+            dictRev = new Dictionary<ValueSet<TKey, TVal>, TKey>(capacity);
             dictRevFlat = new Dictionary<TVal, HashSet<TKey>>(
                 capacity, comparerValue);
             this.comparerKey = comparerKey
@@ -138,9 +118,6 @@ namespace Anvoker.Collections.Maps
             this.comparerValue = comparerValue
                 ?? EqualityComparer<TVal>.Default;
             keysWithNullValue = new HashSet<TKey>(comparerKey);
-            dictValOccurance = new Dictionary<TVal, int>(comparerValue);
-            keyCollection = new KeyCollection(this);
-            valueCollection = new ValueCollection(this);
         }
 
         /// <summary>
@@ -322,6 +299,12 @@ namespace Anvoker.Collections.Maps
         public IEqualityComparer<TVal> ComparerValue => comparerValue;
 
         /// <summary>
+        /// Gets the number of unique values in the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>.
+        /// </summary>
+        public int UniqueValueCount => dictRevFlat.Count;
+
+        /// <summary>
         /// Gets the number of key-to-values elements contained in the
         /// <see cref="MultiBiMap{TKey, TVal}"/>
         /// </summary>
@@ -331,33 +314,21 @@ namespace Anvoker.Collections.Maps
         /// Gets an enumeration of the <see cref="MultiBiMap{TKey, TVal}"/>'s
         /// keys.
         /// </summary>
-        public IEnumerable<TKey> Keys => dictFwd.Keys;
-
-        /// <summary>
-        /// Gets the number of unique values in the
-        /// <see cref="MultiBiMap{TKey, TVal}"/>.
-        /// </summary>
-        public int UniqueValueCount => dictRevFlat.Count;
+        public IReadOnlyCollection<TKey> Keys => dictFwd.Keys;
 
         /// <summary>
         /// Gets an enumeration of the <see cref="MultiBiMap{TKey, TVal}"/>'s
         /// values, grouped by their respective key.
         /// </summary>
-        public IEnumerable<IReadOnlyCollection<TVal>> Values => dictFwd.Values;
+        public IReadOnlyCollection<ISet<TVal>> Values => dictFwd.Values;
+
+        public IEnumerable<TVal> this[TKey key]
+        {
+            get => dictFwd[key];
+            set => Replace(key, value);
+        }
 
         #endregion Public Properties
-
-        #region Public Indexers
-
-        /// <summary>
-        /// Gets the value collection associated with the specified key.
-        /// </summary>
-        /// <param name="key">The key of the value collection to get.</param>
-        /// <returns>A read-only wrapper to the value collection associated
-        /// with the specified key.</returns>
-        public IReadOnlyCollection<TVal> this[TKey key] => dictFwd[key];
-
-        #endregion Public Indexers
 
         #region Public Methods
 
@@ -426,8 +397,7 @@ namespace Anvoker.Collections.Maps
         /// </returns>
         public bool Add(TKey key, HashSet<TVal> values)
         {
-            // TODO check comparer equality
-            if (ContainsKey(key))
+            if (ContainsKey(key) && values.Comparer.Equals(ComparerValue))
             {
                 return AddValues(key, values);
             }
@@ -445,20 +415,13 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the element to add.</param>
         public void AddKey(TKey key)
         {
-            try
+            if (key == null)
             {
-                AddNewKey(key);
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
-            }
+            AddNewKey(key);
         }
 
         /// <summary>
@@ -470,20 +433,13 @@ namespace Anvoker.Collections.Maps
         /// be null for reference types.</param>
         public void AddKey(TKey key, TVal value)
         {
-            try
+            if (key == null)
             {
-                AddNewKey(key, value);
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
-            }
+            AddNewKey(key, value);
         }
 
         /// <summary>
@@ -499,20 +455,13 @@ namespace Anvoker.Collections.Maps
                 throw new ArgumentNullException(nameof(key));
             }
 
-            try
+            if (key == null)
             {
-                AddNewKey(key, values);
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
-            }
+            AddNewKey(key, values);
         }
 
         /// <summary>
@@ -526,20 +475,13 @@ namespace Anvoker.Collections.Maps
         /// false.</returns>
         public bool AddValue(TKey key, TVal value)
         {
-            try
+            if (key == null)
             {
-                return AddExistingKey(key, value);
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
-            }
+            return AddExistingKey(key, value);
         }
 
         /// <summary>
@@ -552,41 +494,40 @@ namespace Anvoker.Collections.Maps
         /// added; otherwise, false.</returns>
         public bool AddValues(TKey key, IEnumerable<TVal> values)
         {
+            if (key == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
+            }
+
             if (values == null)
             {
-                throw new ArgumentNullException(nameof(key));
+                throw new ArgumentNullException(nameof(values));
             }
 
-            try
-            {
-                return AddExistingKey(key, values);
-            }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
-
-                throw;
-            }
+            return AddExistingKey(key, values);
         }
 
         /// <summary>
         /// Removes all keys and values from the
         /// <see cref="MultiBiMap{TKey, TVal}"/>. The internal key and value
-        /// collections are not cleared before being removed from the
-        /// <see cref="MultiBiMap{TKey, TVal}"/>.
+        /// collections are cleared before being removed from the
+        /// <see cref="MultiBiMap{TKey, TVal}"/> which will reflect in any
+        /// variable referencing them.
         /// </summary>
         public void Clear()
         {
-            dictFwd.Clear();
-            dictRev.Clear();
-            dictRevFlat.Clear();
-            dictValOccurance.Clear();
-            keysWithNullValue.Clear();
-            nullValOccurance = 0;
+            foreach (var hashSetValues in dictFwd.Values)
+            {
+                hashSetValues.Clear();
+            }
+
+            foreach (var hashSetKeys in dictRevFlat.Values)
+            {
+                hashSetKeys.Clear();
+            }
+
+            ShallowClear();
         }
 
         /// <summary>
@@ -648,40 +589,64 @@ namespace Anvoker.Collections.Maps
             return dictRevFlat.ContainsKey(value);
         }
 
-        /// <summary>
-        /// Removes all keys and values from the
-        /// <see cref="MultiBiMap{TKey, TVal}"/>. The internal key and value
-        /// collections are cleared before being removed from the
-        /// <see cref="MultiBiMap{TKey, TVal}"/> which will reflect in any
-        /// variable referencing them.
-        /// </summary>
-        public void DeepClear()
+        public IEnumerator<KeyValuePair<TKey, ISet<TVal>>> GetEnumerator()
         {
-            foreach (HashSet<TVal> hashSetValues in dictFwd.Values)
+            foreach (var kvp in dictFwd)
             {
-                hashSetValues.Clear();
+                yield return new KeyValuePair<TKey, ISet<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
             }
-
-            foreach (HashSet<TKey> hashSetKeys in dictRevFlat.Values)
-            {
-                hashSetKeys.Clear();
-            }
-
-            Clear();
         }
 
         /// <summary>
-        /// Returns an enumerator that iterates through the key-values elements
-        /// of the <see cref="MultiBiMap{TKey, TVal}"/>, with values associated
-        /// with a key being grouped in their own collection in each entry.
+        /// Gets keys whose associated value collection has at least one value
+        /// in common with the specified collection.
         /// </summary>
-        /// <returns>A <see cref="Dictionary{TKey, IReadOnlyCollection{TVal}}
-        /// .Enumerator"/> structure for the
-        /// <see cref="MultiBiMap{TKey, TVal}"/>.</returns>
-        public IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TVal>>>
-            GetEnumerator()
-            => ((IDictionary<TKey, IReadOnlyCollection<TVal>>)dictFwd)
-            .GetEnumerator();
+        /// <param name="values">The collection of values to search by.</param>
+        /// <returns>An enumeration of all of the associated keys.
+        /// </returns>
+        public IEnumerable<TKey> GetKeys(Func<IEnumerable<TVal>, bool> selector)
+        {
+            if (selector == null)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
+
+            return GetKeysIterator();
+
+            IEnumerable<TKey> GetKeysIterator()
+            {
+                foreach (var mapValues in dictRev.Keys)
+                {
+                    if (selector(mapValues))
+                    {
+                        yield return dictRev[mapValues];
+                    }
+                }
+            }
+        }
+
+        public IEnumerable<TKey> GetKeys(Func<HashSet<TVal>, bool> selector)
+        {
+            if (selector == null)
+            {
+                throw new ArgumentNullException(nameof(selector));
+            }
+
+            return GetKeysIterator();
+
+            IEnumerable<TKey> GetKeysIterator()
+            {
+                foreach (var mapValues in dictRev.Keys)
+                {
+                    if (selector(mapValues.HashSet))
+                    {
+                        yield return dictRev[mapValues];
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Gets keys whose associated value collection has at least one value
@@ -697,36 +662,7 @@ namespace Anvoker.Collections.Maps
                 throw new ArgumentNullException(nameof(values));
             }
 
-            var matchingKeys = new HashSet<TKey>(ComparerKey);
-
-            foreach (TVal value in values)
-            {
-                if (value != null)
-                {
-                    if (dictRevFlat.ContainsKey(value))
-                    {
-                        foreach (TKey key in dictRevFlat[value])
-                        {
-                            if (!matchingKeys.Contains(key))
-                            {
-                                matchingKeys.Add(key);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    foreach (TKey key in keysWithNullValue)
-                    {
-                        if (!matchingKeys.Contains(key))
-                        {
-                            matchingKeys.Add(key);
-                        }
-                    }
-                }
-            }
-
-            return matchingKeys;
+            return GetKeys((HashSet<TVal> x) => x.Overlaps(values));
         }
 
         /// <summary>
@@ -736,20 +672,23 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        public IEnumerable<TKey> GetKeysWithEqualSet(IEnumerable<TVal> values)
+        public IEnumerable<TKey> GetKeysWithEqualSet(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true)
         {
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
             }
 
-            var valuesHashSet = new HashSet<TVal>(values, ComparerValue);
-            foreach (HashSet<TVal> mapValues in dictRev.Keys)
+            if (ignoreKeysWithNoValues)
             {
-                if (mapValues.SetEquals(valuesHashSet))
-                {
-                    yield return dictRev[mapValues];
-                }
+                return GetKeys((HashSet<TVal> x) => x.Count > 0
+                    && x.SetEquals(values));
+            }
+            else
+            {
+                return GetKeys((HashSet<TVal> x) => x.SetEquals(values));
             }
         }
 
@@ -760,20 +699,23 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        public IEnumerable<TKey> GetKeysWithSubset(IEnumerable<TVal> values)
+        public IEnumerable<TKey> GetKeysWithSubset(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true)
         {
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
             }
 
-            var valuesHashSet = new HashSet<TVal>(values, ComparerValue);
-            foreach (HashSet<TVal> mapValues in dictRev.Keys)
+            if (ignoreKeysWithNoValues)
             {
-                if (mapValues.IsSubsetOf(valuesHashSet))
-                {
-                    yield return dictRev[mapValues];
-                }
+                return GetKeys((HashSet<TVal> x) => x.Count > 0
+                    && x.IsSubsetOf(values));
+            }
+            else
+            {
+                return GetKeys((HashSet<TVal> x) => x.IsSubsetOf(values));
             }
         }
 
@@ -784,61 +726,43 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        public IEnumerable<TKey> GetKeysWithSuperset(IEnumerable<TVal> values)
+        public IEnumerable<TKey> GetKeysWithSuperset(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true)
         {
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
             }
 
-            var valuesHashSet = new HashSet<TVal>(values, ComparerValue);
-            foreach (HashSet<TVal> mapValues in dictRev.Keys)
+            if (ignoreKeysWithNoValues)
             {
-                if (mapValues.IsSupersetOf(valuesHashSet))
-                {
-                    yield return dictRev[mapValues];
-                }
-            }
-        }
-
-        /// <summary>
-        /// Gets all keys that are associated with the specified value.
-        /// </summary>
-        /// <param name="value">The value to locate the keys by.</param>
-        /// <returns>A read-only wrapper to the collection of the associated
-        /// keys associated with the specified value.</returns>
-        public IReadOnlyCollection<TKey> GetKeysWithValue(TVal value)
-        {
-            if (value != null)
-            {
-                bool success = dictRevFlat.TryGetValue(
-                    value, out HashSet<TKey> result);
-                if (success)
-                {
-                    return result;
-                }
+                return GetKeys((HashSet<TVal> x) => x.Count > 0
+                    && x.IsSupersetOf(values));
             }
             else
             {
-                return keysWithNullValue;
+                return GetKeys((HashSet<TVal> x) => x.IsSupersetOf(values));
             }
-
-            return null;
         }
 
         /// <summary>
-        /// Returns an enumerator that iterates through the values-key elements
-        /// of the <see cref="MultiBiMap{TKey, TVal}"/>. Since the same value can be
-        /// associated with multiple keys, keys are grouped in their own
-        /// collection in each element.
+        /// Returns an enumerator that iterates through the key-values elements
+        /// of the <see cref="MultiBiMap{TKey, TVal}"/>.
         /// </summary>
-        /// <returns>A <see cref="Dictionary{TVal, IReadOnlyCollection{TKey}}
-        /// .Enumerator"/> structure for the
+        /// <returns>A enumerator structure for the
         /// <see cref="MultiBiMap{TKey, TVal}"/>.</returns>
-        public IEnumerator<KeyValuePair<TVal, IReadOnlyCollection<TKey>>>
+        public IEnumerator<KeyValuePair<IReadOnlyCollection<TVal>, TKey>>
             GetReverseEnumerator()
-            => ((IDictionary<TVal, IReadOnlyCollection<TKey>>)dictRevFlat)
-            .GetEnumerator();
+        {
+            foreach (var kvp in dictRev)
+            {
+                yield return new
+                    KeyValuePair<IReadOnlyCollection<TVal>, TKey>(
+                    kvp.Key,
+                    kvp.Value);
+            }
+        }
 
         /// <summary>
         /// Removes the element with the specified key from the
@@ -847,65 +771,56 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the element to remove.</param>
         /// <returns>true if the element is successfully found and removed;
         /// otherwise, false.</returns>
-        public bool RemoveKey(TKey key)
+        public bool Remove(TKey key)
         {
-            try
+            if (key == null)
             {
-                if (!dictFwd.ContainsKey(key))
-                {
-                    return false;
-                }
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
 
-                throw;
+            if (!dictFwd.ContainsKey(key))
+            {
+                return false;
             }
 
             var hashSet = dictFwd[key];
             bool fwdSuccess = dictFwd.Remove(key);
             bool revSuccess = dictRev.Remove(hashSet);
 
-            #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                if (!fwdSuccess)
-                {
-                    throw new InvalidProgramException();
-                }
+#if DEVELOPMENT_BUILD || UNITY_EDITOR || DEBUG
+            if (!fwdSuccess)
+            {
+                throw new InvalidProgramException();
+            }
 
-                if (!revSuccess)
-                {
-                    throw new InvalidProgramException();
-                }
-            #endif
+            if (!revSuccess)
+            {
+                throw new InvalidProgramException();
+            }
+#endif
 
             foreach (TVal val in hashSet)
             {
                 if (val != null)
                 {
                     bool revFlatSuccess = dictRevFlat[val].Remove(key);
-                    #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                        if (!revFlatSuccess)
-                        {
-                            throw new InvalidProgramException();
-                        }
-                    #endif
-                    DecrementOrRemoveValueOccurance(val);
+#if DEVELOPMENT_BUILD || UNITY_EDITOR || DEBUG
+                    if (!revFlatSuccess)
+                    {
+                        throw new InvalidProgramException();
+                    }
+#endif
                 }
                 else
                 {
                     bool keysNullSuccess = keysWithNullValue.Remove(key);
-                    #if DEVELOPMENT_BUILD || UNITY_EDITOR
-                        if (!keysNullSuccess)
-                        {
-                            throw new InvalidProgramException();
-                        }
-                    #endif
-                    nullValOccurance--;
+#if DEVELOPMENT_BUILD || UNITY_EDITOR || DEBUG
+                    if (!keysNullSuccess)
+                    {
+                        throw new InvalidProgramException();
+                    }
+#endif
                 }
             }
 
@@ -925,35 +840,29 @@ namespace Anvoker.Collections.Maps
         /// removed; otherwise, false.</returns>
         public bool RemoveValue(TKey key, TVal value)
         {
-            try
+            if (key == null)
             {
-                if (dictFwd.ContainsKey(key) || dictFwd[key].Contains(value))
-                {
-                    return false;
-                }
-            }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Keys cannot be null.");
-                }
-
-                throw;
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
 
-            dictFwd[key].Remove(value);
+            if (!dictFwd.ContainsKey(key))
+            {
+                return false;
+            }
+
+            if (!dictFwd[key].Remove(value))
+            {
+                return false;
+            }
 
             if (value != null)
             {
                 dictRevFlat[value].Remove(key);
-                DecrementOrRemoveValueOccurance(value);
             }
             else
             {
                 keysWithNullValue.Remove(key);
-                nullValOccurance--;
             }
 
             return true;
@@ -969,51 +878,43 @@ namespace Anvoker.Collections.Maps
         /// value removed; otherwise, false.</returns>
         public bool RemoveValues(TKey key, IEnumerable<TVal> values)
         {
+            if (key == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
+            }
+
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(key));
             }
 
-            try
+            if (!dictFwd.ContainsKey(key))
             {
-                if (dictFwd.ContainsKey(key))
-                {
-                    return false;
-                }
-            }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Key cannot be null.");
-                }
-
-                throw;
+                return false;
             }
 
             var hashSet = dictFwd[key];
+            bool removedAtLeastOne = false;
 
             foreach (TVal val in values)
             {
                 if (dictFwd[key].Contains(val))
                 {
-                    dictFwd[key].Remove(val);
+                    removedAtLeastOne |= dictFwd[key].Remove(val);
 
                     if (val != null)
                     {
                         dictRevFlat[val].Remove(key);
-                        DecrementOrRemoveValueOccurance(val);
                     }
                     else
                     {
                         keysWithNullValue.Remove(key);
-                        nullValOccurance--;
                     }
                 }
             }
 
-            return true;
+            return removedAtLeastOne;
         }
 
         /// <summary>
@@ -1021,41 +922,37 @@ namespace Anvoker.Collections.Maps
         /// <see cref="MultiBiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element to remove.</param>
-        public void RemoveValuesAll(TKey key)
+        /// <returns>true if the element is successfully found and its values
+        /// removed; otherwise, false.</returns>
+        public bool RemoveValuesAll(TKey key)
         {
-            HashSet<TVal> hashSetValues = null;
-
-            try
+            if (key == null)
             {
-                hashSetValues = dictFwd[key];
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null.");
             }
-            catch (Exception e)
-            when (e is ArgumentNullException || e is KeyNotFoundException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Key cannot be null.");
-                }
 
-                throw;
+            if (!dictFwd.ContainsKey(key))
+            {
+                return false;
             }
+
+            var hashSetValues = dictFwd[key];
 
             foreach (TVal val in hashSetValues)
             {
                 if (val != null)
                 {
                     dictRevFlat[val].Remove(key);
-                    DecrementOrRemoveValueOccurance(val);
                 }
                 else
                 {
                     keysWithNullValue.Remove(key);
-                    nullValOccurance--;
                 }
             }
 
             hashSetValues.Clear();
+            return true;
         }
 
         /// <summary>
@@ -1075,20 +972,36 @@ namespace Anvoker.Collections.Maps
                 throw new ArgumentNullException(nameof(values));
             }
 
-            if (values is HashSet<TVal>)
+            if (values is ValueSet<TKey, TVal> hash
+                && dictRev.TryGetValue(hash, out TKey key))
             {
-                var hash = (HashSet<TVal>)values;
-
-                if (dictRev.TryGetValue(hash, out TKey key))
-                {
-                    hash.Clear();
-                    RemoveKey(key);
-                    AddNewKey(key);
-                    return true;
-                }
+                hash.Clear();
+                Remove(key);
+                AddNewKey(key);
+                return true;
             }
 
             return false;
+        }
+
+        public void Replace(TKey key, IEnumerable<TVal> value)
+        {
+            RemoveValuesAll(key);
+            AddValues(key, value);
+        }
+
+        /// <summary>
+        /// Removes all keys and values from the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>. The internal key and value
+        /// collections are not cleared before being removed from the
+        /// <see cref="MultiBiMap{TKey, TVal}"/>.
+        /// </summary>
+        public void ShallowClear()
+        {
+            dictFwd.Clear();
+            dictRev.Clear();
+            dictRevFlat.Clear();
+            keysWithNullValue.Clear();
         }
 
         /// <summary>
@@ -1105,16 +1018,15 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the <see cref="MultiBiMap{TKey, TVal}"/> contains the
         /// specified value collection; otherwise, false.</returns>
         public bool TryGetKeyByCollectionRef(
-            IReadOnlyCollection<TVal> values, out TKey key)
+            IEnumerable<TVal> values, out TKey key)
         {
             if (values == null)
             {
                 throw new ArgumentNullException(nameof(values));
             }
 
-            if (values is HashSet<TVal>)
+            if (values is ValueSet<TKey, TVal> hash)
             {
-                var hash = (HashSet<TVal>)values;
                 return dictRev.TryGetValue(hash, out key);
             }
 
@@ -1132,33 +1044,23 @@ namespace Anvoker.Collections.Maps
         /// the value parameter.</param>
         /// <returns>true if the <see cref="MultiBiMap{TKey, TVal}"/> contains
         /// an element with the specified key; otherwise, false.</returns>
-        public bool TryGetValue(TKey key, out IReadOnlyCollection<TVal> value)
+        public bool TryGetValue(TKey key, out ICollection<TVal> value)
         {
-            HashSet<TVal> hashSet = null;
-            bool success = false;
-
-            try
+            if (key == null)
             {
-                success = dictFwd.TryGetValue(key, out hashSet);
-            }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Key cannot be null.");
-                }
-
-                throw;
+                throw new ArgumentNullException(
+                    nameof(key), "Key cannot be null.");
             }
 
+            bool success = dictFwd.TryGetValue(
+                key, out ValueSet<TKey, TVal> hashSet);
             value = hashSet;
             return success;
         }
 
-#endregion Public Methods
+        #endregion Public Methods
 
-#region Private Methods
+        #region Private Methods
 
         private bool AddExistingKey(TKey key, TVal val)
         {
@@ -1174,12 +1076,10 @@ namespace Anvoker.Collections.Maps
             if (val != null)
             {
                 AddFlatEntry(key, val);
-                IncrementOrSetValueOccurance(val);
             }
             else
             {
                 keysWithNullValue.Add(key);
-                nullValOccurance++;
             }
 
             return true;
@@ -1201,12 +1101,10 @@ namespace Anvoker.Collections.Maps
                     if (val != null)
                     {
                         AddFlatEntry(key, val);
-                        IncrementOrSetValueOccurance(val);
                     }
                     else
                     {
                         keysWithNullValue.Add(key);
-                        nullValOccurance++;
                     }
                 }
             }
@@ -1228,31 +1126,29 @@ namespace Anvoker.Collections.Maps
 
         private void AddNewKey(TKey key)
         {
-            var hashSetValues = new HashSet<TVal>(ComparerValue);
+            var hashSetValues = new ValueSet<TKey, TVal>(key, this);
             dictFwd.Add(key, hashSetValues);
             dictRev.Add(hashSetValues, key);
         }
 
         private void AddNewKey(TKey key, TVal val)
         {
-            var hashSetValues = new HashSet<TVal>(ComparerValue) { val };
+            var hashSetValues = new ValueSet<TKey, TVal>(key, this, val);
             dictFwd.Add(key, hashSetValues);
             dictRev.Add(hashSetValues, key);
             if (val != null)
             {
                 AddFlatEntry(key, val);
-                IncrementOrSetValueOccurance(val);
             }
             else
             {
                 keysWithNullValue.Add(key);
-                nullValOccurance++;
             }
         }
 
         private void AddNewKey(TKey key, IEnumerable<TVal> vals)
         {
-            var hashSetValues = new HashSet<TVal>(vals, ComparerValue);
+            var hashSetValues = new ValueSet<TKey, TVal>(key, this, vals);
             dictFwd.Add(key, hashSetValues);
             dictRev.Add(hashSetValues, key);
             foreach (TVal val in hashSetValues)
@@ -1260,19 +1156,17 @@ namespace Anvoker.Collections.Maps
                 if (val != null)
                 {
                     AddFlatEntry(key, val);
-                    IncrementOrSetValueOccurance(val);
                 }
                 else
                 {
                     keysWithNullValue.Add(key);
-                    nullValOccurance++;
                 }
             }
         }
 
         private void AddNewKey(TKey key, HashSet<TVal> vals)
         {
-            var hashSetValues = new HashSet<TVal>(vals, ComparerValue);
+            var hashSetValues = new ValueSet<TKey, TVal>(key, this, vals);
             dictFwd.Add(key, hashSetValues);
             dictRev.Add(hashSetValues, key);
             foreach (TVal val in hashSetValues)
@@ -1280,37 +1174,11 @@ namespace Anvoker.Collections.Maps
                 if (val != null)
                 {
                     AddFlatEntry(key, val);
-                    IncrementOrSetValueOccurance(val);
                 }
                 else
                 {
                     keysWithNullValue.Add(key);
-                    nullValOccurance++;
                 }
-            }
-        }
-
-        private void DecrementOrRemoveValueOccurance(TVal val)
-        {
-            if (dictValOccurance[val] == 1)
-            {
-                dictValOccurance.Remove(val);
-            }
-            else
-            {
-                dictValOccurance[val]--;
-            }
-        }
-
-        private void IncrementOrSetValueOccurance(TVal val)
-        {
-            if (dictValOccurance.ContainsKey(val))
-            {
-                dictValOccurance[val]++;
-            }
-            else
-            {
-                dictValOccurance[val] = 1;
             }
         }
 
@@ -1318,13 +1186,13 @@ namespace Anvoker.Collections.Maps
         {
             foreach (TKey key in enumerable)
             {
-                var hashSet = new HashSet<TVal>(ComparerValue);
+                var hashSet = new ValueSet<TKey, TVal>(key, this);
                 dictFwd.Add(key, hashSet);
                 dictRev.Add(hashSet, key);
             }
         }
 
-#endregion Private Methods
+        #endregion Private Methods
     }
 
     /// <content>
@@ -1332,191 +1200,189 @@ namespace Anvoker.Collections.Maps
     /// </content>
     public partial class MultiBiMap<TKey, TVal>
     {
-#region Public Properties
+        #region Public Properties
 
-        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.IsReadOnly
-            => false;
+        IEqualityComparer<IReadOnlyCollection<TVal>>
+            IReadOnlyBiMap<TKey, IReadOnlyCollection<TVal>>.ComparerValue
+            => EqualityComparer<IReadOnlyCollection<TVal>>.Default;
 
-        ICollection<TKey> IDictionary<TKey, ICollection<TVal>>.Keys
-            => dictFwd.Keys;
+        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+                    .IsReadOnly => false;
 
-        ICollection<ICollection<TVal>> IDictionary<TKey, ICollection<TVal>>
-            .Values => (ICollection<ICollection<TVal>>)
-            (ICollection<HashSet<TVal>>)dictFwd.Values;
+        IEnumerable<TKey> IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .Keys => dictFwd.Keys;
 
-        IEnumerable<TVal> IReadOnlyDictionary<TKey, TVal>.Values
-        {
-            get
-            {
-                foreach (HashSet<TVal> values in dictFwd.Values)
-                {
-                    foreach (TVal val in values)
-                    {
-                        yield return val;
-                    }
-                }
-            }
-        }
+        ICollection<TKey> IDictionary<TKey, ICollection<TVal>>
+            .Keys => dictFwd.Keys;
 
-        IEnumerable<ICollection<TVal>>
-            IReadOnlyDictionary<TKey, ICollection<TVal>>.Values
-            => dictFwd.Values;
+        IEnumerable<IReadOnlyCollection<TVal>>
+            IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .Values => dictFwd.Values;
 
-#endregion Public Properties
+        IReadOnlyCollection<IReadOnlyCollection<TVal>>
+            IMultiMap<TKey, TVal>
+            .Values => dictFwd.Values;
 
-#region Public Indexers
+        ICollection<ICollection<TVal>>
+            IDictionary<TKey, ICollection<TVal>>
+            .Values => dictFwd.Values.Cast<ICollection<TVal>>().ToList();
 
-        ICollection<TVal>
-            IReadOnlyDictionary<TKey, ICollection<TVal>>.this[TKey key]
-            => dictFwd[key];
+        #endregion Public Properties
 
-        TVal IReadOnlyDictionary<TKey, TVal>.this[TKey key]
-        {
-            get
-            {
-                foreach (TVal val in dictFwd[key])
-                {
-                    return val;
-                }
-
-                if (dictFwd[key].Count <= 0)
-                {
-                    throw new InvalidOperationException(
-                        "There are no values associated with this key.");
-                }
-                else
-                {
-                    throw new InvalidProgramException();
-                }
-            }
-        }
+        #region Public Indexers
 
         ICollection<TVal> IDictionary<TKey, ICollection<TVal>>.this[TKey key]
         {
-            get
-            {
-                return dictFwd[key];
-            }
-
-            set
-            {
-                RemoveKey(key);
-                AddKey(key, value);
-            }
+            get => dictFwd[key];
+            set => Replace(key, value);
         }
 
-#endregion Public Indexers
+        IReadOnlyCollection<TVal>
+            IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .this[TKey key]
+        {
+            get => dictFwd[key];
+        }
 
-#region Public Methods
+        #endregion Public Indexers
 
-        void IDictionary<TKey, ICollection<TVal>>.Add(
-            TKey key, ICollection<TVal> value) => Add(key, value);
+        #region Public Methods
 
-        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Add(
-            KeyValuePair<TKey, ICollection<TVal>> item)
+        IReadOnlyCollection<TKey>
+            IFixedKeysBiMap<TKey, IReadOnlyCollection<TVal>>
+            .this[IReadOnlyCollection<TVal> val]
+            => GetKeysWithEqualSet(val).ToList();
+
+        void IDictionary<TKey, ICollection<TVal>>
+                    .Add(TKey key, ICollection<TVal> value)
+            => Add(key, value);
+
+        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .Add(KeyValuePair<TKey, ICollection<TVal>> item)
             => Add(item.Key, item.Value);
 
-        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
-            KeyValuePair<TKey, ICollection<TVal>> item)
+        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .Contains(KeyValuePair<TKey, ICollection<TVal>> item)
+            => ContainsKeyWithValues(item.Key, item.Value);
+
+        bool IReadOnlyBiMap<TKey, IReadOnlyCollection<TVal>>
+            .ContainsValue(IReadOnlyCollection<TVal> value)
+            => GetKeysWithEqualSet(value).Any();
+
+        bool IReadOnlyMultiMap<TKey, TVal>
+            .ContainsValue(IEnumerable<TVal> value)
+            => GetKeysWithEqualSet(value).Any();
+
+        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .CopyTo(
+            KeyValuePair<TKey, ICollection<TVal>>[] array,
+            int arrayIndex)
         {
-            if (!ContainsKey(item.Key))
+            if (array == null)
             {
-                return false;
+                throw new ArgumentNullException(nameof(array));
             }
 
-            if (item.Value == null)
+            if (arrayIndex < 0)
             {
-                return dictFwd[item.Key] == null;
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
             }
-            else
+
+            if (dictFwd.Count + arrayIndex > array.Length)
             {
-                return dictFwd[item.Key].SetEquals(item.Value);
+                throw new ArgumentException("The number of elements in the " +
+                    "source is greater than the available space from " +
+                    "arrayIndex to the end of the destination array.");
+            }
+
+            int i = arrayIndex;
+            foreach (var kvp in dictFwd)
+            {
+                array[i]
+                    = new KeyValuePair<TKey, ICollection<TVal>>(
+                        kvp.Key,
+                        kvp.Value);
+                i++;
             }
         }
 
-        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.CopyTo(
-            KeyValuePair<TKey, ICollection<TVal>>[] array,
-            int arrayIndex)
-            => ((ICollection<KeyValuePair<TKey, ICollection<TVal>>>)dictFwd)
-            .CopyTo(array, arrayIndex);
-
-        IEnumerator IEnumerable.GetEnumerator() => dictFwd.GetEnumerator();
-
-        IEnumerator<KeyValuePair<TKey, TVal>>
-            IEnumerable<KeyValuePair<TKey, TVal>>.GetEnumerator()
+        IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>
+            IMultiMap<TKey, TVal>.GetEnumerator()
         {
-            foreach (KeyValuePair<TKey, HashSet<TVal>> kvp in dictFwd)
+            foreach (var kvp in dictFwd)
             {
-                foreach (TVal val in dictFwd[kvp.Key])
-                {
-                    yield return new KeyValuePair<TKey, TVal>(kvp.Key, val);
-                }
+                yield return new KeyValuePair<TKey, ICollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
             }
         }
 
         IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>
             IEnumerable<KeyValuePair<TKey, ICollection<TVal>>>.GetEnumerator()
-            => (IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>)
-            GetEnumerator();
-
-        bool IDictionary<TKey, ICollection<TVal>>.Remove(TKey key)
-            => RemoveKey(key);
-
-        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Remove(
-            KeyValuePair<TKey, ICollection<TVal>> item) =>
-            ContainsKey(item.Key)
-            && dictFwd[item.Key].SetEquals(item.Value)
-            && RemoveKey(item.Key);
-
-        bool IReadOnlyDictionary<TKey, ICollection<TVal>>.TryGetValue(
-            TKey key,
-            out ICollection<TVal> value)
-            => ((IDictionary<TKey, ICollection<TVal>>)this).TryGetValue(
-                key, out value);
-
-        bool IReadOnlyDictionary<TKey, TVal>.TryGetValue(
-            TKey key, out TVal value)
         {
-            HashSet<TVal> hashSet;
-            bool success = false;
-
-            try
+            foreach (var kvp in dictFwd)
             {
-                success = dictFwd.TryGetValue(key, out hashSet);
+                yield return new KeyValuePair<TKey, ICollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
             }
-            catch (ArgumentNullException)
+        }
+
+        IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TVal>>>
+            IEnumerable<KeyValuePair<TKey, IReadOnlyCollection<TVal>>>
+            .GetEnumerator()
+        {
+            foreach (var kvp in dictFwd)
             {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Key cannot be null.");
-                }
-
-                throw;
+                yield return new KeyValuePair<TKey, IReadOnlyCollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
             }
+        }
 
-            if (success)
+        IEnumerator IEnumerable.GetEnumerator() => dictFwd.GetEnumerator();
+
+        IReadOnlyCollection<TKey>
+            IReadOnlyBiMap<TKey, IReadOnlyCollection<TVal>>
+            .GetKeysWithValue(IReadOnlyCollection<TVal> value)
+        {
+            if (value == null)
             {
-                foreach (TVal val in hashSet)
-                {
-                    value = val;
-                    return true;
-                }
+                throw new ArgumentNullException(nameof(value));
             }
 
-            value = default(TVal);
+            return new List<TKey>(GetKeysWithEqualSet(value));
+        }
+
+        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .Remove(KeyValuePair<TKey, ICollection<TVal>> item)
+            => ContainsKeyWithValues(item.Key, item.Value) && Remove(item.Key);
+
+        void IFixedKeysBiMap<TKey, IReadOnlyCollection<TVal>>
+            .Replace(TKey key, IReadOnlyCollection<TVal> value)
+            => Replace(key, value);
+
+        bool IDictionary<TKey, ICollection<TVal>>
+                                                                                                            .TryGetValue(TKey key, out ICollection<TVal> value)
+        {
+            value = null;
+            if (dictFwd.TryGetValue(key, out var hashSet))
+            {
+                value = hashSet;
+                return true;
+            }
+
             return false;
         }
 
-        bool IDictionary<TKey, ICollection<TVal>>.TryGetValue(
-            TKey key, out ICollection<TVal> value)
+        bool IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .TryGetValue(TKey key, out IReadOnlyCollection<TVal> value)
         {
-            bool success = TryGetValue(
-                key, out IReadOnlyCollection<TVal> hashSetValues);
-            value = (ICollection<TVal>)hashSetValues;
+            var success = TryGetValue(key, out var value2);
+            value = (IReadOnlyCollection<TVal>)value2;
             return success;
         }
 
-#endregion Public Methods
+        #endregion Public Methods
     }
 }

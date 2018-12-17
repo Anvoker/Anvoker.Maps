@@ -19,9 +19,7 @@ namespace Anvoker.Collections.Maps
     /// </typeparam>
     /// <typeparam name="TVal">The type of the values.
     /// </typeparam>
-    public partial class BiMap<TKey, TVal> : IBiMap<TKey, TVal>,
-        IReadOnlyBiMap<TKey, TVal>,
-        IFixedKeysBiMap<TKey, TVal>
+    public partial class BiMap<TKey, TVal> : IBiMap<TKey, TVal>
     {
         #region Private Fields
 
@@ -324,7 +322,7 @@ namespace Anvoker.Collections.Maps
         /// are not cleared before being removed from the
         /// <see cref="MultiBiMap{TKey, TVal}"/>.
         /// </summary>
-        public void Clear()
+        public void ShallowClear()
         {
             dictFwd.Clear();
             dictRev.Clear();
@@ -370,14 +368,14 @@ namespace Anvoker.Collections.Maps
         /// which will reflect in any variable referencing them though read-only
         /// wrappers.
         /// </summary>
-        public void DeepClear()
+        public void Clear()
         {
             foreach (HashSet<TKey> hashSetKeys in dictRev.Values)
             {
                 hashSetKeys.Clear();
             }
 
-            Clear();
+            ShallowClear();
         }
 
         /// <summary>
@@ -423,10 +421,17 @@ namespace Anvoker.Collections.Maps
         /// <returns>A <see cref="Dictionary{TVal, IReadOnlyCollection{TKey}}
         /// .Enumerator"/> structure for the
         /// <see cref="BiMap{TKey, TVal}"/>.</returns>
-        public IEnumerator<KeyValuePair<TVal, IReadOnlyCollection<TKey>>>
+        public IEnumerator<KeyValuePair<TVal, TKey>>
             GetReverseEnumerator()
-            => ((IDictionary<TVal, IReadOnlyCollection<TKey>>)dictRev)
-            .GetEnumerator();
+        {
+            foreach (var kvp in dictRev)
+            {
+                foreach (var value in kvp.Value)
+                {
+                    yield return new KeyValuePair<TVal, TKey>(kvp.Key, value);
+                }
+            }
+        }
 
         /// <summary>
         /// Removes the element with the specified key from the
@@ -563,9 +568,7 @@ namespace Anvoker.Collections.Maps
     /// <content>
     /// Explicit interface implementations.
     /// </content>
-    public partial class BiMap<TKey, TVal> : IBiMap<TKey, TVal>,
-        IReadOnlyBiMap<TKey, TVal>,
-        IFixedKeysBiMap<TKey, TVal>
+    public partial class BiMap<TKey, TVal> : IBiMap<TKey, TVal>
     {
         #region Public Properties
 

@@ -8,8 +8,7 @@ namespace Anvoker.Collections.Maps
     /// <typeparam name="TKey">The type of the keys.</typeparam>
     /// <typeparam name="TVal">The type of the values.</typeparam>
     public interface IReadOnlyMultiMap<TKey, TVal> :
-        IReadOnlyDictionary<TKey, ICollection<TVal>>,
-        IReadOnlyDictionary<TKey, TVal>
+        IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
     {
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{T}"/> that is used to
@@ -36,6 +35,8 @@ namespace Anvoker.Collections.Maps
         /// contains an element with the specified value; otherwise, false.
         /// </returns>
         bool ContainsValue(TVal value);
+
+        bool ContainsValue(IEnumerable<TVal> values);
 
         /// <summary>
         /// Determines whether the <see cref="IReadOnlyMultiMap{TKey, TVal}"/>

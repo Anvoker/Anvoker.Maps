@@ -1,15 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
+using NUnit.Framework.Interfaces;
+using static Anvoker.Collections.Tests.Maps.MapTestDataSource;
 
 namespace Anvoker.Collections.Tests.Maps.MultiMap
 {
     /// <summary>
     /// Provides test data for a
-    /// <see cref="IDictionaryNestedBase{TKey, TVal, TIDict, TValCol}"/> test
+    /// <see cref="IDictionaryNestedBase{TKey, TVal, TMultiMap, TValCol}"/> test
     /// fixture.
     /// </summary>
     public static class IDictionaryNested_FixtureSource
@@ -22,58 +23,33 @@ namespace Anvoker.Collections.Tests.Maps.MultiMap
         /// <returns>An array of objects where each object is a collection
         /// that contains all of the necessary parameters to run a constructor
         /// of matching type.</returns>
-        public static TestFixtureParameters[] GetFixtureArgs()
+        public static ITestFixtureData[] GetFixtureArgs()
             => new TestFixtureParameters[]
             {
-                ConstructFixtureParams(
-                    MapTestDataSource.IntDecimal),
-                ConstructFixtureParams(
-                    MapTestDataSource.StringStringCaseInsensitive),
-                ConstructFixtureParams(
-                    MapTestDataSource.StringStringCaseSensitive),
-                ConstructFixtureParams(
-                    MapTestDataSource.ListType)
+                IntDecimal                 .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                StringStringCaseInsensitive.Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                StringStringCaseSensitive  .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                ListType                   .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name)
             };
 
-        private static Func<MultiMap<TKey, TVal>> GetCtor<TKey, TVal>(
+        private static ICollection<TVal> GetCtorVal<TVal>(
+            IEnumerable<TVal> x,
+            IEqualityComparer<TVal> y)
+            => new HashSet<TVal>(x, y);
+
+        private static IDictionary<TKey, ICollection<TVal>> GetCtor<TKey, TVal>(
             TKey[] keys,
             TVal[][] values,
             IEqualityComparer<TKey> comparerKey,
-            IEqualityComparer<TVal> comparerVal)
+            IEqualityComparer<TVal> comparerValue)
         {
-            return () =>
+            var map = new MultiMap<TKey, TVal>(comparerKey, comparerValue);
+            for (int i = 0; i < keys.Length; i++)
             {
-                var multiMap = new MultiMap<TKey, TVal>(
-                    comparerKey,
-                    comparerVal);
-                for (int i = 0; i < keys.Length; i++)
-                {
-                    multiMap.Add(keys[i], values[i]);
-                }
+                map.Add(keys[i], values[i]);
+            }
 
-                return multiMap;
-            };
-        }
-
-        private static TestFixtureParameters ConstructFixtureParams<TKey, TVal>(
-            MapTestData<TKey, TVal> data)
-        {
-            var keyType = typeof(TKey);
-            var valType = typeof(TVal);
-            var ctor = GetCtor(
-                data.KeysInitial,
-                data.ValuesInitial,
-                data.ComparerKey,
-                data.ComparerValue);
-            string testName
-                = $"{nameof(MultiMap<TKey, TVal>)} | {data.TestDataName}";
-            return IDictionaryNestedBase<TKey, TVal,
-                MultiMap<TKey, TVal>, ICollection<TVal>>
-                .ConstructFixtureParams(
-                ctor,
-                (x) => new HashSet<TVal>(x, data.ComparerValue),
-                data,
-                testName);
+            return (IDictionary<TKey, ICollection<TVal>>)map;
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common;
 using NUnit.Framework;
@@ -7,14 +6,14 @@ using NUnit.Framework.Internal;
 using NUnit.Framework.Interfaces;
 using static Anvoker.Collections.Tests.Maps.MapTestDataSource;
 
-namespace Anvoker.Collections.Tests.Maps.MultiBiMap
+namespace Anvoker.Collections.Tests.Maps.MultiMap
 {
     /// <summary>
     /// Provides test data for a
-    /// <see cref="IMultiMapBase{TKey, TVal, TMultiMap, TValCol}"/> test
-    /// fixture.
+    /// <see cref="IReadOnlyDictionaryNestedBase{TKey, TVal, TMultiMap, TValCol}"/>
+    /// test fixture.
     /// </summary>
-    public static class IMultiMap_FixtureSource
+    public static class IReadOnlyDictionaryNested_FixtureSource
     {
         /// <summary>
         /// Provides the arguments for a test fixture that is decorated with
@@ -27,30 +26,30 @@ namespace Anvoker.Collections.Tests.Maps.MultiBiMap
         public static ITestFixtureData[] GetFixtureArgs()
             => new TestFixtureParameters[]
             {
-                IntDecimal                 .Construct(GetCtor, GetCtorVal, typeof(MultiBiMap<,>).Name),
-                StringStringCaseInsensitive.Construct(GetCtor, GetCtorVal, typeof(MultiBiMap<,>).Name),
-                StringStringCaseSensitive  .Construct(GetCtor, GetCtorVal, typeof(MultiBiMap<,>).Name),
-                ListType                   .Construct(GetCtor, GetCtorVal, typeof(MultiBiMap<,>).Name)
+                IntDecimal                 .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                StringStringCaseInsensitive.Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                StringStringCaseSensitive  .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name),
+                ListType                   .Construct(GetCtor, GetCtorVal, typeof(MultiMap<,>).Name)
             };
 
-        private static ICollection<TVal> GetCtorVal<TVal>(
+        private static IReadOnlyCollection<TVal> GetCtorVal<TVal>(
             IEnumerable<TVal> x,
             IEqualityComparer<TVal> y)
             => new HashSet<TVal>(x, y);
 
-        private static IMultiMap<TKey, TVal> GetCtor<TKey, TVal>(
+        private static IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>> GetCtor<TKey, TVal>(
             TKey[] keys,
             TVal[][] values,
             IEqualityComparer<TKey> comparerKey,
             IEqualityComparer<TVal> comparerValue)
         {
-            var map = new MultiBiMap<TKey, TVal>(comparerKey, comparerValue);
+            var map = new MultiMap<TKey, TVal>(comparerKey, comparerValue);
             for (int i = 0; i < keys.Length; i++)
             {
                 map.Add(keys[i], values[i]);
             }
 
-            return (IMultiMap<TKey, TVal>)map;
+            return (IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>)map;
         }
     }
 }

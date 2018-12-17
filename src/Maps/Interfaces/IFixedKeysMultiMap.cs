@@ -9,23 +9,8 @@ namespace Anvoker.Collections.Maps
     /// <typeparam name="TKey">The type of the keys.</typeparam>
     /// <typeparam name="TVal">The type of the values.</typeparam>
     public interface IFixedKeysMultiMap<TKey, TVal> :
-        IReadOnlyDictionary<TKey, ICollection<TVal>>,
-        IReadOnlyDictionary<TKey, TVal>
+        IReadOnlyMultiMap<TKey, TVal>
     {
-        /// <summary>
-        /// Gets the <see cref="IEqualityComparer{T}"/> that is used to
-        /// determine equality of keys for the
-        /// <see cref="IBiMap{TKey, TVal}"/>.
-        /// </summary>
-        IEqualityComparer<TKey> ComparerKey { get; }
-
-        /// <summary>
-        /// Gets the <see cref="IEqualityComparer{T}"/> that is used to
-        /// determine equality of values for the
-        /// <see cref="IBiMap{TKey, TVal}"/>.
-        /// </summary>
-        IEqualityComparer<TVal> ComparerValue { get; }
-
         /// <summary>
         /// Adds the value to the specified key in the
         /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>.
@@ -48,31 +33,7 @@ namespace Anvoker.Collections.Maps
         /// added; otherwise, false.</returns>
         bool AddValues(TKey key, IEnumerable<TVal> values);
 
-        /// <summary>
-        /// Determines whether the <see cref="IFixedKeysMultiMap{TKey, TVal}"/>
-        /// contains a specific value.
-        /// </summary>
-        /// <param name="value">The value to locate in the
-        /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>. The value can be null
-        /// for reference types.</param>
-        /// <returns>true if the <see cref="IFixedKeysMultiMap{TKey, TVal}"/>
-        /// contains an element with the specified value; otherwise, false.
-        /// </returns>
-        bool ContainsValue(TVal value);
-
-        /// <summary>
-        /// Determines whether the <see cref="IFixedKeysMultiMap{TKey, TVal}"/>
-        /// contains a specific value at the specified key.
-        /// </summary>
-        /// <param name="key">The key to locate in the
-        /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>.</param>
-        /// <param name="value">The value to locate in the
-        /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>. The value can be null for
-        /// reference types.</param>
-        /// <returns>true if the <see cref="IFixedKeysMultiMap{TKey, TVal}"/>
-        /// contains an element with the specified key and value; otherwise,
-        /// false.</returns>
-        bool ContainsKeyWithValue(TKey key, TVal value);
+        void Replace(TKey key, IEnumerable<TVal> values);
 
         /// <summary>
         /// Removes the value associated with the specified key from the
@@ -102,6 +63,8 @@ namespace Anvoker.Collections.Maps
         /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element.</param>
-        void RemoveValuesAll(TKey key);
+        /// <returns>true if the element is successfully found and its values
+        /// removed; otherwise, false.</returns>
+        bool RemoveValuesAll(TKey key);
     }
 }

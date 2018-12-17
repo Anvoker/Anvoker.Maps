@@ -142,7 +142,7 @@ namespace Anvoker.Collections.Tests.Maps
                 valuesExcluded: new Type[][]
                 {
                     new Type[] { typeof(long) },
-                    new Type[] { },
+                    new Type[] { typeof(uint) },
                     new Type[] { typeof(DateTime) },
                 },
                 comparerKey: null,

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common;
 using NUnit.Framework;
@@ -11,10 +10,10 @@ namespace Anvoker.Collections.Tests.Maps.MultiBiMap
 {
     /// <summary>
     /// Provides test data for a
-    /// <see cref="IMultiMapBase{TKey, TVal, TMultiMap, TValCol}"/> test
-    /// fixture.
+    /// <see cref="IReadOnlyDictionaryNestedBase{TKey, TVal, TMultiMap, TValCol}"/>
+    /// test fixture.
     /// </summary>
-    public static class IMultiMap_FixtureSource
+    public static class IReadOnlyDictionaryNested_FixtureSource
     {
         /// <summary>
         /// Provides the arguments for a test fixture that is decorated with
@@ -33,12 +32,12 @@ namespace Anvoker.Collections.Tests.Maps.MultiBiMap
                 ListType                   .Construct(GetCtor, GetCtorVal, typeof(MultiBiMap<,>).Name)
             };
 
-        private static ICollection<TVal> GetCtorVal<TVal>(
+        private static IReadOnlyCollection<TVal> GetCtorVal<TVal>(
             IEnumerable<TVal> x,
             IEqualityComparer<TVal> y)
             => new HashSet<TVal>(x, y);
 
-        private static IMultiMap<TKey, TVal> GetCtor<TKey, TVal>(
+        private static IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>> GetCtor<TKey, TVal>(
             TKey[] keys,
             TVal[][] values,
             IEqualityComparer<TKey> comparerKey,
@@ -50,7 +49,7 @@ namespace Anvoker.Collections.Tests.Maps.MultiBiMap
                 map.Add(keys[i], values[i]);
             }
 
-            return (IMultiMap<TKey, TVal>)map;
+            return (IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>)map;
         }
     }
 }

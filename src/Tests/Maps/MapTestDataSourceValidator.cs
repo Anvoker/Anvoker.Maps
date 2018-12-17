@@ -8,7 +8,7 @@ using NUnit.Framework;
 
 namespace Anvoker.Collections.Tests.Maps
 {
-    [TestFixture, Order(0)]
+    [TestFixture]
     public class MapTestDataSourceValidator
     {
         private readonly static MethodInfo validateMethodUnbound =
@@ -24,34 +24,31 @@ namespace Anvoker.Collections.Tests.Maps
                 BindingFlags.Static | BindingFlags.Public);
 
         [Test]
-        public void Validate()
+        public void Validate([ValueSource(nameof(fields))] FieldInfo field)
         {
             var sb = new StringBuilder();
 
-            foreach (FieldInfo field in fields)
+            var mapType = field.FieldType;
+            if (mapType.GetGenericTypeDefinition() == genericMap)
             {
-                var mapType = field.FieldType;
-                if (mapType.GetGenericTypeDefinition() == genericMap)
+                Type[] args = mapType.GetGenericArguments();
+                Type keyType = args[0];
+                Type valType = args[1];
+                object mapData = field.GetValue(null);
+
+                var validateMethod = validateMethodUnbound
+                    .MakeGenericMethod(new Type[] { keyType, valType });
+
+                var result = validateMethod.Invoke(
+                    null,
+                    new object[] { mapData, field.Name });
+
+                string str = (string)result;
+                str = str.Trim();
+                if (str.Length > 0)
                 {
-                    Type[] args = mapType.GetGenericArguments();
-                    Type keyType = args[0];
-                    Type valType = args[1];
-                    object mapData = field.GetValue(null);
-
-                    var validateMethod = validateMethodUnbound
-                        .MakeGenericMethod(new Type[] { keyType, valType });
-
-                    var result = validateMethod.Invoke(
-                        null,
-                        new object[] { mapData, field.Name });
-
-                    string str = (string)result;
-                    str = str.Trim();
-                    if (str.Length > 0)
-                    {
-                        sb.AppendLine((string)result);
-                        sb.AppendLine("=============");
-                    }
+                    sb.AppendLine((string)result);
+                    sb.AppendLine("=============");
                 }
             }
 
@@ -193,6 +190,14 @@ namespace Anvoker.Collections.Tests.Maps
                 d.ComparerValue,
                 source);
 
+            BothHaveEmptyCollectionThrow(
+                sb,
+                d.ValuesInitial,
+                d.ValuesExcluded,
+                nameof(MapTestData<TKey, TVal>.ValuesInitial),
+                nameof(MapTestData<TKey, TVal>.ValuesExcluded),
+                source);
+
             return sb.ToString();
         }
 
@@ -217,6 +222,28 @@ namespace Anvoker.Collections.Tests.Maps
                     .Append(source)
                     .Append(". Common elements: ")
                     .AppendLine(sbTemp.ToString().Trim(' ', ','));
+            }
+        }
+
+        private static void BothHaveEmptyCollectionThrow<T>(
+            StringBuilder sb,
+            T[][] arr1,
+            T[][] arr2,
+            string name1,
+            string name2,
+            string source)
+        {
+            var l = Math.Min(arr1.Length, arr2.Length);
+            for (int i = 0; i < l; i++)
+            {
+                if (arr1[i].Length == 0 && arr2[i].Length == 0)
+                {
+                    sb.Append(name1).Append(" and ").Append(name2).Append(" ")
+                        .Append("can't both be empty. ")
+                        .Append("At index (i = ").Append(i).Append(") ")
+                        .Append("in ")
+                        .AppendLine(source);
+                }
             }
         }
 

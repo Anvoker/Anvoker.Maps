@@ -1,13 +1,9 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 #pragma warning disable RCS1169 // Mark field as read-only.
-#pragma warning disable RCS1227 // Validate arguments correctly.
-#pragma warning disable RCS1220 // Use pattern matching instead of combination of 'is' operator and cast operator.
-#pragma warning disable IDE0020 // Use pattern matching
-#pragma warning disable IDE0034 // Simplify 'default' expression
-#pragma warning disable IDE0027 // Use expression body for accessors
 
 namespace Anvoker.Collections.Maps
 {
@@ -19,15 +15,12 @@ namespace Anvoker.Collections.Maps
     /// </typeparam>
     /// <typeparam name="TVal">The type of the values in the two way dictionary.
     /// </typeparam>
-    public partial class MultiMap<TKey, TVal> : IMultiMap<TKey, TVal>,
-        IFixedKeysMultiMap<TKey, TVal>,
-        IReadOnlyMultiMap<TKey, TVal>
+    public partial class MultiMap<TKey, TVal> : IMultiMap<TKey, TVal>
     {
         #region Private Fields
 
-        private Dictionary<TKey, HashSet<TVal>> multiDict;
         private IEqualityComparer<TVal> comparerValue;
-        private ValueSets<TKey, TVal> valueSets;
+        private Dictionary<TKey, ValueSet<TKey, TVal>> multiDict;
 
         #endregion Private Fields
 
@@ -95,7 +88,7 @@ namespace Anvoker.Collections.Maps
             IEqualityComparer<TKey> comparerKey,
             IEqualityComparer<TVal> comparerValue)
         {
-            multiDict = new Dictionary<TKey, HashSet<TVal>>(
+            multiDict = new Dictionary<TKey, ValueSet<TKey, TVal>>(
                 capacity, comparerKey);
             this.comparerValue = comparerValue
                 ?? EqualityComparer<TVal>.Default;
@@ -121,29 +114,14 @@ namespace Anvoker.Collections.Maps
         /// default <see cref="EqualityComparer{TVal}"/> for the type of the
         /// values.</param>
         public MultiMap(
-            IDictionary<TKey, HashSet<TVal>> multiMap,
+            MultiMap<TKey, TVal> multiMap,
             IEqualityComparer<TKey> comparerKey,
             IEqualityComparer<TVal> comparerValue)
         {
-            multiDict = new Dictionary<TKey, HashSet<TVal>>(
-                multiMap, comparerKey);
+            multiDict = new Dictionary<TKey, ValueSet<TKey, TVal>>(
+                multiMap.multiDict, comparerKey);
             this.comparerValue = comparerValue
                 ?? EqualityComparer<TVal>.Default;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the
-        /// <see cref="MultiMap{TKey, TVal}"/> class that contains elements
-        /// copied from the specified
-        /// <see cref="IDictionary{TKey, HashSet{TVal}}"/> and uses the
-        /// default equality comparers for the key and value types.
-        /// </summary>
-        /// <param name="multiMap">The
-        /// <see cref="IDictionary{TKey, HashSet{TVal}}"/> that is copied to the
-        /// new <see cref="MultiMap{TKey, TVal}"/>.</param>
-        public MultiMap(IDictionary<TKey, HashSet<TVal>> multiMap)
-            : this(multiMap, null, null)
-        {
         }
 
         /// <summary>
@@ -272,15 +250,13 @@ namespace Anvoker.Collections.Maps
         /// Gets an enumeration of the <see cref="MultiMap{TKey, TVal}"/>'s
         /// keys.
         /// </summary>
-        public ICollection<TKey> Keys => multiDict.Keys;
+        public IReadOnlyCollection<TKey> Keys => multiDict.Keys;
 
         /// <summary>
         /// Gets an enumeration of the <see cref="MultiMap{TKey, TVal}"/>'s
         /// values.
         /// </summary>
-        public ValueSets<TKey, TVal> Values
-            => valueSets ?? (valueSets = new ValueSets<TKey, TVal>(
-                multiDict.Values));
+        public IReadOnlyCollection<ISet<TVal>> Values => multiDict.Values;
 
         #endregion Public Properties
 
@@ -292,7 +268,15 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the value collection to get.</param>
         /// <returns>The value collection associated with the specified key.
         /// </returns>
-        public ICollection<TVal> this[TKey key] => multiDict[key];
+        public IEnumerable<TVal> this[TKey key]
+        {
+            get => multiDict[key];
+            set
+            {
+                RemoveValuesAll(key);
+                AddValues(key, value);
+            }
+        }
 
         #endregion Public Indexers
 
@@ -380,7 +364,8 @@ namespace Anvoker.Collections.Maps
         /// </summary>
         /// <param name="key">The key of the element to add.</param>
         public void AddKey(TKey key)
-            => multiDict.Add(key, new HashSet<TVal>(ComparerValue));
+            => multiDict.Add(key,
+                new ValueSet<TKey, TVal>(key, this));
 
         /// <summary>
         /// Adds the specified key and its associated value to the
@@ -390,7 +375,8 @@ namespace Anvoker.Collections.Maps
         /// <param name="value">The value of the element to add. The value can
         /// be null for reference types.</param>
         public void AddKey(TKey key, TVal value)
-            => multiDict.Add(key, new HashSet<TVal>(ComparerValue) { value });
+            => multiDict.Add(key,
+                new ValueSet<TKey, TVal>(key, this, value));
 
         /// <summary>
         /// Adds the specified key and its associated values to the
@@ -399,7 +385,8 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the element to add.</param>
         /// <param name="values">The values of the element to add.</param>
         public void AddKey(TKey key, IEnumerable<TVal> values)
-            => multiDict.Add(key, new HashSet<TVal>(values, ComparerValue));
+            => multiDict.Add(key,
+                new ValueSet<TKey, TVal>(key, this, values));
 
         /// <summary>
         /// Adds the specified key and its associated values to the
@@ -413,16 +400,17 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The values of the element to add.</param>
         public void AddKey(TKey key, HashSet<TVal> values)
         {
-            if (!ReferenceEquals(values.Comparer, ComparerValue))
+            if (values.Comparer.Equals(ComparerValue))
             {
                 throw new ArgumentException(
                     $@"The Comparer of the passed HashSet argument has to be
-                        reference equal to the {nameof(ComparerValue)} of the
+                        equal to the {nameof(ComparerValue)} of the
                         {nameof(MultiMap<TKey, TVal>)}.",
                     nameof(values));
             }
 
-            multiDict.Add(key, values);
+            multiDict.Add(key,
+                new ValueSet<TKey, TVal>(key, this, values));
         }
 
         /// <summary>
@@ -442,7 +430,7 @@ namespace Anvoker.Collections.Maps
                     ArgumentNullException(nameof(key), "Keys cannot be null.");
             }
 
-            return ContainsKey(key) && multiDict[key].Add(value);
+            return ContainsKey(key) && multiDict[key].HashSet.Add(value);
         }
 
         /// <summary>
@@ -468,7 +456,7 @@ namespace Anvoker.Collections.Maps
             }
 
             bool atLeastOneValueAdded = false;
-            HashSet<TVal> hashSetValues = multiDict[key];
+            HashSet<TVal> hashSetValues = multiDict[key].HashSet;
             foreach (TVal value in values)
             {
                 atLeastOneValueAdded |= hashSetValues.Add(value);
@@ -477,13 +465,15 @@ namespace Anvoker.Collections.Maps
             return atLeastOneValueAdded;
         }
 
-        /// <summary>
-        /// Removes all keys and values from the
-        /// <see cref="MultiMap{TKey, TVal}"/>. The internal key and value
-        /// collections are not cleared before being removed from the
-        /// <see cref="MultiMap{TKey, TVal}"/>.
-        /// </summary>
-        public void Clear() => multiDict.Clear();
+        public void Clear()
+        {
+            foreach (var values in multiDict.Values)
+            {
+                values.Clear();
+            }
+
+            ShallowClear();
+        }
 
         /// <summary>
         /// Determines whether the <see cref="MultiMap{TKey, TVal}"/> contains
@@ -536,7 +526,7 @@ namespace Anvoker.Collections.Maps
         /// an element with the specified value; otherwise, false.</returns>
         public bool ContainsValue(TVal value)
         {
-            foreach (HashSet<TVal> hashSetValues in multiDict.Values)
+            foreach (var hashSetValues in multiDict.Values)
             {
                 if (hashSetValues.Contains(value))
                 {
@@ -547,18 +537,28 @@ namespace Anvoker.Collections.Maps
             return false;
         }
 
-        /// <summary>
-        /// Returns an enumerator that iterates through the key-values elements
-        /// of the <see cref="MultiMap{TKey, TVal}"/>, with values associated
-        /// with a key being grouped in their own collection in each entry.
-        /// </summary>
-        /// <returns>A <see cref="Dictionary{TKey, ICollection{TVal}}
-        /// .Enumerator"/> structure for the
-        /// <see cref="MultiMap{TKey, TVal}"/>.</returns>
-        public IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>
-            GetEnumerator()
-            => ((IDictionary<TKey, ICollection<TVal>>)multiDict)
-            .GetEnumerator();
+        public bool ContainsValue(IEnumerable<TVal> values)
+        {
+            foreach (var hashSetValues in multiDict.Values)
+            {
+                if (hashSetValues.SetEquals(values))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public IEnumerator<KeyValuePair<TKey, ISet<TVal>>> GetEnumerator()
+        {
+            foreach (var kvp in multiDict)
+            {
+                yield return new KeyValuePair<TKey, ISet<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
+            }
+        }
 
         /// <summary>
         /// Removes the element with the specified key from the
@@ -567,7 +567,8 @@ namespace Anvoker.Collections.Maps
         /// <param name="key">The key of the element to remove.</param>
         /// <returns>true if the element is successfully found and removed;
         /// otherwise, false.</returns>
-        public bool RemoveKey(TKey key) => multiDict.Remove(key);
+        public bool Remove(TKey key)
+            => multiDict.ContainsKey(key) && multiDict.Remove(key);
 
         /// <summary>
         /// Removes the value associated with the specified key from the
@@ -580,21 +581,19 @@ namespace Anvoker.Collections.Maps
         /// removed; otherwise, false.</returns>
         public bool RemoveValue(TKey key, TVal value)
         {
-            try
-            {
-                if (multiDict.TryGetValue(key, out HashSet<TVal> values))
-                {
-                    return values.Remove(value);
-                }
-                else
-                {
-                    throw new KeyNotFoundException();
-                }
-            }
-            catch (ArgumentNullException)
+            if (key == null)
             {
                 throw new ArgumentNullException(
                     nameof(key), "Keys cannot be null");
+            }
+
+            if (multiDict.TryGetValue(key, out var values))
+            {
+                return values.Remove(value);
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -608,27 +607,25 @@ namespace Anvoker.Collections.Maps
         /// value removed; otherwise, false.</returns>
         public bool RemoveValues(TKey key, IEnumerable<TVal> values)
         {
-            try
-            {
-                bool atLeastOneValueRemoved = false;
-                if (multiDict.TryGetValue(key, out HashSet<TVal> hashSetValues))
-                {
-                    foreach (TVal value in values)
-                    {
-                        atLeastOneValueRemoved |= hashSetValues.Add(value);
-                    }
-
-                    return atLeastOneValueRemoved;
-                }
-                else
-                {
-                    throw new KeyNotFoundException();
-                }
-            }
-            catch (ArgumentNullException)
+            if (key == null)
             {
                 throw new ArgumentNullException(
                     nameof(key), "Keys cannot be null");
+            }
+
+            bool atLeastOneValueRemoved = false;
+            if (multiDict.TryGetValue(key, out var hashSetValues))
+            {
+                foreach (TVal value in values)
+                {
+                    atLeastOneValueRemoved |= hashSetValues.Remove(value);
+                }
+
+                return atLeastOneValueRemoved;
+            }
+            else
+            {
+                return false;
             }
         }
 
@@ -637,24 +634,68 @@ namespace Anvoker.Collections.Maps
         /// <see cref="MultiMap{TKey, TVal}"/>.
         /// </summary>
         /// <param name="key">The key of the element to remove.</param>
-        public void RemoveValuesAll(TKey key)
+        /// <returns>true if the element is successfully found and its values
+        /// removed; otherwise, false.</returns>
+        public bool RemoveValuesAll(TKey key)
         {
-            try
-            {
-                if (multiDict.TryGetValue(key, out HashSet<TVal> hashSetValues))
-                {
-                    hashSetValues.Clear();
-                }
-                else
-                {
-                    throw new KeyNotFoundException();
-                }
-            }
-            catch (ArgumentNullException)
+            if (key == null)
             {
                 throw new ArgumentNullException(
                     nameof(key), "Keys cannot be null");
             }
+
+            if (multiDict.TryGetValue(key, out var hashSetValues))
+            {
+                hashSetValues.Clear();
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public void Replace(TKey key, IEnumerable<TVal> values)
+        {
+            RemoveValuesAll(key);
+            AddValues(key, values);
+        }
+
+        /// <summary>
+        /// Removes all keys and values from the
+        /// <see cref="MultiMap{TKey, TVal}"/>. The internal key and value
+        /// collections are not cleared before being removed from the
+        /// <see cref="MultiMap{TKey, TVal}"/>.
+        /// </summary>
+        public void ShallowClear() => multiDict.Clear();
+
+        /// <summary>
+        /// Gets the value collection associated with the specified key.
+        /// </summary>
+        /// <param name="key">The key of the element to get.</param>
+        /// <param name="values">When this method returns, contains the value
+        /// collection associated with the specified key, if the key is found;
+        /// otherwise, the default value for the type of the value parameter.
+        /// </param>
+        /// <returns>true if the <see cref="MultiMap{TKey, TVal}"/> contains
+        /// an element with the specified key; otherwise, false.</returns>
+        public bool TryGetValue(TKey key, out ICollection<TVal> values)
+        {
+            if (key == null)
+            {
+                throw new ArgumentNullException(
+                    nameof(key), "Keys cannot be null");
+            }
+
+            values = null;
+            bool success = false;
+            if (success = multiDict.TryGetValue(
+                key, out var hashSetValues))
+            {
+                values = hashSetValues;
+            }
+
+            return success;
         }
 
         /// <summary>
@@ -667,23 +708,20 @@ namespace Anvoker.Collections.Maps
         /// </param>
         /// <returns>true if the <see cref="MultiMap{TKey, TVal}"/> contains
         /// an element with the specified key; otherwise, false.</returns>
-        public bool TryGetValue(TKey key, out ICollection<TVal> value)
+        public bool TryGetValue(TKey key, out ISet<TVal> value)
         {
-            value = null;
-            bool success = false;
-
-            try
-            {
-                if (success = multiDict.TryGetValue(
-                    key, out HashSet<TVal> hashSetValues))
-                {
-                    value = hashSetValues;
-                }
-            }
-            catch (ArgumentNullException)
+            if (key == null)
             {
                 throw new ArgumentNullException(
                     nameof(key), "Keys cannot be null");
+            }
+
+            value = null;
+            bool success = false;
+            if (success = multiDict.TryGetValue(
+                key, out var hashSetValues))
+            {
+                value = hashSetValues;
             }
 
             return success;
@@ -699,153 +737,146 @@ namespace Anvoker.Collections.Maps
     {
         #region Public Properties
 
-        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.IsReadOnly
-            => false;
+        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .IsReadOnly => false;
+
+        ICollection<TKey>
+            IDictionary<TKey, ICollection<TVal>>
+            .Keys => multiDict.Keys;
 
         IEnumerable<TKey>
-            IReadOnlyDictionary<TKey, ICollection<TVal>>.Keys => multiDict.Keys;
+            IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .Keys => Keys;
 
-        IEnumerable<TKey>
-            IReadOnlyDictionary<TKey, TVal>.Keys => multiDict.Keys;
+        ICollection<ICollection<TVal>> IDictionary<TKey, ICollection<TVal>>
+            .Values => multiDict.Values.Cast<ICollection<TVal>>().ToList();
 
-        ICollection<ICollection<TVal>>
-            IDictionary<TKey, ICollection<TVal>>.Values => Values;
+        IReadOnlyCollection<IReadOnlyCollection<TVal>> IMultiMap<TKey, TVal>
+            .Values => multiDict.Values;
 
-        IEnumerable<ICollection<TVal>>
-            IReadOnlyDictionary<TKey, ICollection<TVal>>.Values
-            => multiDict.Values;
-
-        IEnumerable<TVal> IReadOnlyDictionary<TKey, TVal>.Values
-        {
-            get
-            {
-                foreach (TKey key in multiDict.Keys)
-                {
-                    foreach (TVal value in multiDict[key])
-                    {
-                        yield return value;
-                    }
-                }
-            }
-        }
+        IEnumerable<IReadOnlyCollection<TVal>>
+            IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .Values => multiDict.Values;
 
         #endregion Public Properties
 
         #region Public Indexers
 
-        TVal IReadOnlyDictionary<TKey, TVal>.this[TKey key]
+        ICollection<TVal>
+            IDictionary<TKey, ICollection<TVal>>.this[TKey key]
         {
-            get
+            get => multiDict[key];
+            set
             {
-                foreach (TVal value in multiDict[key])
-                {
-                    return value;
-                }
-
-                if (multiDict[key].Count <= 0)
-                {
-                    throw new InvalidOperationException(
-                        "There are no values associated with this key.");
-                }
-                else
-                {
-                    throw new InvalidProgramException();
-                }
+                RemoveValuesAll(key);
+                AddValues(key, value);
             }
         }
 
-        ICollection<TVal> IDictionary<TKey, ICollection<TVal>>.this[TKey key]
+        IReadOnlyCollection<TVal>
+            IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>.this[TKey key]
         {
-            get
-            {
-                return multiDict[key];
-            }
-
-            set
-            {
-                multiDict[key] = new HashSet<TVal>(value, ComparerValue);
-            }
+            get => multiDict[key];
         }
 
         #endregion Public Indexers
 
         #region Public Methods
 
-        void IDictionary<TKey, ICollection<TVal>>.Add(
-            TKey key, ICollection<TVal> value)
+        void IDictionary<TKey, ICollection<TVal>>
+            .Add(TKey key, ICollection<TVal> value)
             => Add(key, value);
 
-        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Add(
-            KeyValuePair<TKey, ICollection<TVal>> item)
+        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .Add(KeyValuePair<TKey, ICollection<TVal>> item)
             => Add(item.Key, item.Value);
 
-        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Contains(
-            KeyValuePair<TKey, ICollection<TVal>> item)
-            => item.Value != null
-            && multiDict.ContainsKey(item.Key)
+        bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .Contains(KeyValuePair<TKey, ICollection<TVal>> item)
+            => multiDict.ContainsKey(item.Key)
             && multiDict[item.Key].SetEquals(item.Value);
 
-        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>.CopyTo(
-            KeyValuePair<TKey, ICollection<TVal>>[] array, int arrayIndex)
-            => ((ICollection<KeyValuePair<TKey, ICollection<TVal>>>)multiDict)
-            .CopyTo(array, arrayIndex);
-
-        IEnumerator IEnumerable.GetEnumerator() => multiDict.GetEnumerator();
-
-        IEnumerator<KeyValuePair<TKey, TVal>>
-            IEnumerable<KeyValuePair<TKey, TVal>>.GetEnumerator()
+        void ICollection<KeyValuePair<TKey, ICollection<TVal>>>
+            .CopyTo(
+            KeyValuePair<TKey, ICollection<TVal>>[] array,
+            int arrayIndex)
         {
-            foreach (TKey key in multiDict.Keys)
+            if (array == null)
             {
-                foreach (TVal value in multiDict[key])
-                {
-                    yield return new KeyValuePair<TKey, TVal>(key, value);
-                }
+                throw new ArgumentNullException(nameof(array));
+            }
+
+            if (arrayIndex < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(arrayIndex));
+            }
+
+            if (multiDict.Count + arrayIndex > array.Length)
+            {
+                throw new ArgumentException("The number of elements in the " +
+                    "source is greater than the available space from " +
+                    "arrayIndex to the end of the destination array.");
+            }
+
+            int i = arrayIndex;
+            foreach (var kvp in multiDict)
+            {
+                array[i]
+                    = new KeyValuePair<TKey, ICollection<TVal>>(
+                        kvp.Key,
+                        kvp.Value);
+                i++;
             }
         }
 
-        bool IDictionary<TKey, ICollection<TVal>>.Remove(TKey key)
-            => RemoveKey(key);
+        IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>
+            IMultiMap<TKey, TVal>.GetEnumerator()
+        {
+            foreach (var kvp in multiDict)
+            {
+                yield return new KeyValuePair<TKey, ICollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
+            }
+        }
+
+        IEnumerator<KeyValuePair<TKey, IReadOnlyCollection<TVal>>>
+            IEnumerable<KeyValuePair<TKey, IReadOnlyCollection<TVal>>>
+            .GetEnumerator()
+        {
+            foreach (var kvp in multiDict)
+            {
+                yield return new KeyValuePair<TKey, IReadOnlyCollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
+            }
+        }
+
+        IEnumerator<KeyValuePair<TKey, ICollection<TVal>>>
+            IEnumerable<KeyValuePair<TKey, ICollection<TVal>>>.GetEnumerator()
+        {
+            foreach (var kvp in multiDict)
+            {
+                yield return new KeyValuePair<TKey, ICollection<TVal>>(
+                    kvp.Key,
+                    kvp.Value);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => multiDict.GetEnumerator();
 
         bool ICollection<KeyValuePair<TKey, ICollection<TVal>>>.Remove(
-            KeyValuePair<TKey, ICollection<TVal>> item)
-            => ContainsKey(item.Key)
+                    KeyValuePair<TKey, ICollection<TVal>> item)
+            => multiDict.ContainsKey(item.Key)
             && multiDict[item.Key].SetEquals(item.Value)
-            && RemoveKey(item.Key);
+            && multiDict.Remove(item.Key);
 
-        bool IReadOnlyDictionary<TKey, TVal>.TryGetValue(
-            TKey key,
-            out TVal value)
+        bool IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+            .TryGetValue(TKey key, out IReadOnlyCollection<TVal> value)
         {
-            HashSet<TVal> hashSet;
-            bool success = false;
-
-            try
-            {
-                success = multiDict.TryGetValue(key, out hashSet);
-            }
-            catch (ArgumentNullException)
-            {
-                if (key == null)
-                {
-                    throw new ArgumentNullException(
-                        nameof(key), "Key cannot be null.");
-                }
-
-                throw;
-            }
-
-            if (success)
-            {
-                foreach (TVal val in hashSet)
-                {
-                    value = val;
-                    return true;
-                }
-            }
-
-            value = default(TVal);
-            return false;
+            var success = multiDict.TryGetValue(key, out var value2);
+            value = value2;
+            return success;
         }
 
         #endregion Public Methods

@@ -6,8 +6,6 @@ using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 using static Anvoker.Collections.Tests.Common.HelperMethods;
 
-#pragma warning disable IDE0034 // Simplify 'default' expression
-
 namespace Anvoker.Collections.Tests.Common
 {
     /// <summary>
@@ -27,7 +25,8 @@ namespace Anvoker.Collections.Tests.Common
     /// <see cref="IDictionary{TKey, TValue}"/>.</typeparam>
     /// <typeparam name="TValCol">Type of the nested collection used as the
     /// value type in <see cref="IDictionary{TKey, TValue}"/>.</typeparam>
-    public class IDictionaryNestedBase<TKey, TVal, TIDict, TValCol>
+    public class IDictionaryNestedBase<TKey, TVal, TIDict, TValCol> :
+        MapTestDataConstructible<TKey, TVal, TIDict, TValCol>
         where TIDict : IDictionary<TKey, TValCol>
         where TValCol : IEnumerable<TVal>
     {
@@ -36,9 +35,6 @@ namespace Anvoker.Collections.Tests.Common
         /// test fixture.
         /// </summary>
         private readonly MapTestDataConcrete<TKey, TVal, TIDict, TValCol> d;
-
-        private readonly string nullabeSkipMsg
-            = "The key is not nullable, so this test is not applicable.";
 
         /// <summary>
         /// Initializes a new instance of the
@@ -53,50 +49,6 @@ namespace Anvoker.Collections.Tests.Common
             MapTestDataConcrete<TKey, TVal, TIDict, TValCol> args)
         {
             d = args;
-        }
-
-        /// <summary>
-        /// Constructs the parameter class required for instantiating this
-        /// test fixture for a particular collection type that implements
-        /// <see cref="IDictionary{TKey, TValue}"/> with a nested collection
-        /// as the value.
-        /// </summary>
-        /// <param name="ctorImplementor">Delegate pointing to a
-        /// parameterless constructor of <typeparamref name="TIDict"/>.</param>
-        /// <param name="ctorTValCol">Delegate pointing to a constructor that
-        /// takes <see cref="IEnumerable{T}"/> and returns a new value
-        /// collection <typeparamref name="TValCol"/></param>
-        /// <param name="data">The concrete test data.</param>
-        /// <param name="testName">Name displayed in the test runner.</param>
-        /// <returns>A new instance of <see cref="TestFixtureParameters"/> that
-        /// can be used to instantiate a
-        /// <see cref="IDictionaryNestedBase{TKey, TVal, TIDict, TValCol}"/>
-        /// fixture.</returns>
-        public static TestFixtureParameters
-            ConstructFixtureParams(
-            Func<TIDict> ctorImplementor,
-            Func<IEnumerable<TVal>, TValCol> ctorTValCol,
-            MapTestData<TKey, TVal> data,
-            string testName)
-        {
-            var args = new MapTestDataConcrete<TKey, TVal, TIDict, TValCol>(
-                ctorImplementor, ctorTValCol, data);
-            var exposedParams = new ExposedTestFixtureParams()
-            {
-                TestName = testName,
-                Arguments = new object[] { args },
-                Properties = new PropertyBag(),
-                RunState = RunState.Runnable,
-                TypeArgs = new Type[]
-                {
-                    typeof(TKey),
-                    typeof(TVal),
-                    typeof(TIDict),
-                    typeof(TValCol)
-                }
-            };
-
-            return new TestFixtureParameters(exposedParams);
         }
 
         [Test]
@@ -158,18 +110,14 @@ namespace Anvoker.Collections.Tests.Common
         [Test]
         public void Add_Key_NullKeyThrows()
         {
-            if (d.KeyIsNullabe)
+            if (!d.KeyIsNullabe)
             {
-                var collection = d.ImplementorCtor();
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
 
-                Assert.Throws(
-                    typeof(ArgumentNullException),
-                    () => collection.Add(default(TKey), d.ValuesToAdd[0]));
-            }
-            else
-            {
-                Assert.False(d.KeyIsNullabe, nullabeSkipMsg);
-            }
+            var collection = d.ImplementorCtor();
+            Assert.Throws<ArgumentNullException>(() =>
+                collection.Add(default(TKey), d.ValuesToAdd[0]));
         }
 
         [Test]
@@ -232,20 +180,15 @@ namespace Anvoker.Collections.Tests.Common
         [Test]
         public void Add_KVP_NullKeyThrows()
         {
-            if (d.KeyIsNullabe)
+            if (!d.KeyIsNullabe)
             {
-                var collection = d.ImplementorCtor();
-                var kvp = new KeyValuePair<TKey, TValCol>(
-                    default(TKey), d.ValuesToAdd[0]);
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
 
-                Assert.Throws(
-                    typeof(ArgumentNullException),
-                    () => collection.Add(kvp));
-            }
-            else
-            {
-                Assert.False(d.KeyIsNullabe, nullabeSkipMsg);
-            }
+            var collection = d.ImplementorCtor();
+            var kvp = new KeyValuePair<TKey, TValCol>(
+                default(TKey), d.ValuesToAdd[0]);
+            Assert.Throws<ArgumentNullException>(() => collection.Add(kvp));
         }
 
         [Test]
@@ -267,7 +210,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ClearSetsCountToZero()
+        public void Clear_SetsCountToZero()
         {
             var collection = d.ImplementorCtor();
             collection.Clear();
@@ -275,7 +218,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ContainsInitialKeys()
+        public void ContainsKey_InitialKeys()
         {
             var collection = d.ImplementorCtor();
             Assert.Multiple(() =>
@@ -288,7 +231,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ContainsInitialKVPs()
+        public void Contains_InitialKVPs()
         {
             var collection = d.ImplementorCtor();
             Assert.Multiple(() =>
@@ -301,7 +244,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ContainsNoExcludedKeys()
+        public void ContainsKey_NoExcludedKeys()
         {
             var collection = d.ImplementorCtor();
             Assert.Multiple(() =>
@@ -314,7 +257,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ContainsNoExcludedKVP()
+        public void Contains_NoExcludedKVP()
         {
             var collection = d.ImplementorCtor();
             Assert.Multiple(() =>
@@ -327,22 +270,7 @@ namespace Anvoker.Collections.Tests.Common
         }
 
         [Test]
-        public void ContainsNoKVPsWithNullValueCollection()
-        {
-            var collection = d.ImplementorCtor();
-            var newKVPs = ConstructKVPs<TKey, TValCol>(d.KeysInitial, null);
-
-            Assert.Multiple(() =>
-            {
-                foreach (var kvp in newKVPs)
-                {
-                    Assert.IsFalse(collection.Contains(kvp));
-                }
-            });
-        }
-
-        [Test]
-        public void CountInitialValueIsCorrect()
+        public void Count_InitialValueIsCorrect()
         {
             var collection = d.ImplementorCtor();
             Assert.AreEqual(d.KeysInitial.Length, collection.Count);
@@ -374,18 +302,14 @@ namespace Anvoker.Collections.Tests.Common
         [Test]
         public void Remove_Key_NullKeyThrows()
         {
-            if (d.KeyIsNullabe)
+            if (!d.KeyIsNullabe)
             {
-                var collection = d.ImplementorCtor();
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
 
-                Assert.Throws(
-                    typeof(ArgumentNullException),
-                    () => collection.Remove(default(TKey)));
-            }
-            else
-            {
-                Assert.False(d.KeyIsNullabe, nullabeSkipMsg);
-            }
+            var collection = d.ImplementorCtor();
+            Assert.Throws<ArgumentNullException>(() =>
+                collection.Remove(default(TKey)));
         }
 
         [Test]
@@ -432,21 +356,18 @@ namespace Anvoker.Collections.Tests.Common
         [Test]
         public void Remove_KVP_NullKeyThrows()
         {
-            if (d.KeyIsNullabe)
+            if (!d.KeyIsNullabe)
             {
-                var collection = d.ImplementorCtor();
-                var kvp = new KeyValuePair<TKey, TValCol>(
-                    default(TKey),
-                    d.ValuesInitial[0]);
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
 
-                Assert.Throws(
-                    typeof(ArgumentNullException),
-                    () => collection.Remove(kvp));
-            }
-            else
-            {
-                Assert.False(d.KeyIsNullabe, nullabeSkipMsg);
-            }
+            var collection = d.ImplementorCtor();
+            var kvp = new KeyValuePair<TKey, TValCol>(
+                default(TKey),
+                d.ValuesInitial[0]);
+
+            Assert.Throws<ArgumentNullException>(() =>
+                collection.Remove(kvp));
         }
 
         /// <summary>
@@ -538,20 +459,136 @@ namespace Anvoker.Collections.Tests.Common
         [Test]
         public void TryGetValue_NullKeyThrows()
         {
-            if (d.KeyIsNullabe)
+            if (!d.KeyIsNullabe)
             {
-                var collection = d.ImplementorCtor();
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
 
-                Assert.Throws(
-                    typeof(ArgumentNullException),
-                    () => collection.TryGetValue(
-                        default(TKey),
-                        out TValCol value));
-            }
-            else
+            var collection = d.ImplementorCtor();
+            Assert.Throws<ArgumentNullException>(() =>
+                collection.TryGetValue(default(TKey), out TValCol value));
+        }
+
+        [Test]
+        public void GetEnumerator()
+        {
+            var collection = d.ImplementorCtor();
+            var enumerator = collection.GetEnumerator();
+            var keys = new List<TKey>();
+            var values = new List<TValCol>();
+            using (enumerator)
             {
-                Assert.False(d.KeyIsNullabe, nullabeSkipMsg);
+                while (enumerator.MoveNext())
+                {
+                    keys.Add(enumerator.Current.Key);
+                    values.Add(enumerator.Current.Value);
+                }
             }
+
+            Assert.Multiple(() =>
+            {
+                CollectionAssert.AreEquivalent(collection.Keys, keys);
+                CollectionAssert.AreEquivalent(collection.Values, values);
+            });
+        }
+
+        [Test]
+        public void CopyTo()
+        {
+            var collection = d.ImplementorCtor();
+            var actual = new KeyValuePair<TKey, TValCol>[collection.Count];
+            collection.CopyTo(actual, 0);
+
+            CollectionAssert.AreEquivalent(d.KVPsInitial, actual);
+        }
+
+        [Test]
+        public void Keys_Initial()
+        {
+            var collection = d.ImplementorCtor();
+            CollectionAssert.AreEquivalent(d.KeysInitial, collection.Keys);
+        }
+
+        [Test]
+        public void Values_Initial()
+        {
+            var collection = d.ImplementorCtor();
+            CollectionAssert.AreEquivalent(d.ValuesInitial, collection.Values);
+        }
+
+        [Test]
+        public void Indexer_Get_ExistingKey()
+        {
+            var collection = d.ImplementorCtor();
+            Assert.Multiple(() =>
+            {
+                for (int i = 0; i < d.KeysInitial.Length; i++)
+                {
+                    CollectionAssert.AreEquivalent(
+                        d.ValuesInitial[i],
+                        collection[d.KeysInitial[i]]);
+                }
+            });
+        }
+
+        [Test]
+        public void Indexer_Get_NonExistingKey()
+        {
+            var collection = d.ImplementorCtor();
+            Assert.Multiple(() =>
+            {
+                for (int i = 0; i < d.KeysExcluded.Length; i++)
+                {
+                    IEnumerable<TVal> value;
+                    Assert.Throws<KeyNotFoundException>(() =>
+                        value = collection[d.KeysExcluded[i]]);
+                }
+            });
+        }
+
+        [Test]
+        public void Indexer_Set_ExistingKey()
+        {
+            var collection = d.ImplementorCtor();
+            var length = Math.Min(d.KeysInitial.Length, d.KeysExcluded.Length);
+            Assert.Multiple(() =>
+            {
+                for (int i = 0; i < length; i++)
+                {
+                    collection[d.KeysInitial[i]] = d.ValuesExcluded[i];
+                    CollectionAssert.AreEquivalent(
+                        d.ValuesExcluded[i],
+                        collection[d.KeysInitial[i]]);
+                }
+            });
+        }
+
+        [Test]
+        public void Indexer_Set_NonExistingKey()
+        {
+            var collection = d.ImplementorCtor();
+            Assert.Multiple(() =>
+            {
+                for (int i = 0; i < d.KeysExcluded.Length; i++)
+                {
+                    TValCol value = d.ValuesExcluded[i];
+                    Assert.Throws<KeyNotFoundException>(() =>
+                        collection[d.KeysExcluded[i]] = value);
+                }
+            });
+        }
+
+        [Test]
+        public void Indexer_Set_NullValueThrows()
+        {
+            if (!d.KeyIsNullabe)
+            {
+                Assert.Pass(AssertMsgs[MsgKeys.NullableSkip]);
+            }
+
+            var collection = d.ImplementorCtor();
+            Assert.Throws<ArgumentNullException>(() =>
+                collection[d.KeysInitial[0]] = default(TValCol));
         }
     }
 }

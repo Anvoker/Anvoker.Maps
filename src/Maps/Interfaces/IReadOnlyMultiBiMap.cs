@@ -9,8 +9,8 @@ namespace Anvoker.Collections.Maps
     /// <typeparam name="TKey">The type of the keys.</typeparam>
     /// <typeparam name="TVal">The type of the values.</typeparam>
     public interface IReadOnlyMultiBiMap<TKey, TVal> :
-        IReadOnlyBiMap<TKey, TVal>,
-        IReadOnlyDictionary<TKey, IReadOnlyCollection<TVal>>
+        IReadOnlyMultiMap<TKey, TVal>,
+        IReadOnlyBiMap<TKey, IReadOnlyCollection<TVal>>
     {
         /// <summary>
         /// Gets the key associated with the specified value collection, using
@@ -25,7 +25,7 @@ namespace Anvoker.Collections.Maps
         /// contains a key with the specified collection; otherwise false.
         /// </returns>
         bool TryGetKeyByCollectionRef(
-            IReadOnlyCollection<TVal> values, out TKey key);
+            IEnumerable<TVal> values, out TKey key);
 
         /// <summary>
         /// Gets keys whose associated value collection satisfies set equality
@@ -34,7 +34,9 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        IEnumerable<TKey> GetKeysWithEqualSet(IEnumerable<TVal> values);
+        IEnumerable<TKey> GetKeysWithEqualSet(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true);
 
         /// <summary>
         /// Gets keys whose associated value collection is a superset of the
@@ -43,7 +45,9 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        IEnumerable<TKey> GetKeysWithSuperset(IEnumerable<TVal> values);
+        IEnumerable<TKey> GetKeysWithSuperset(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true);
 
         /// <summary>
         /// Gets keys whose associated value collection is a subset of the
@@ -52,7 +56,9 @@ namespace Anvoker.Collections.Maps
         /// <param name="values">The collection of values to search by.</param>
         /// <returns>An enumeration of all of the associated keys.
         /// </returns>
-        IEnumerable<TKey> GetKeysWithSubset(IEnumerable<TVal> values);
+        IEnumerable<TKey> GetKeysWithSubset(
+            IEnumerable<TVal> values,
+            bool ignoreKeysWithNoValues = true);
 
         /// <summary>
         /// Gets keys whose associated value collection has at least one value

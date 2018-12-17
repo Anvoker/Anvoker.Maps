@@ -50,17 +50,5 @@ namespace Anvoker.Collections.Maps
         /// <returns>A read-only collection with all of the associated keys.
         /// </returns>
         IReadOnlyCollection<TKey> GetKeysWithValue(TVal value);
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the values-key elements
-        /// of the <see cref="IReadOnlyBiMap{TKey, TVal}"/>. Since the same value
-        /// can be associated with multiple keys, keys are grouped in their own
-        /// collection in each element.
-        /// </summary>
-        /// <returns>A <see cref="Dictionary{TVal, IReadOnlyCollection{TKey}}
-        /// .Enumerator"/> structure for the
-        /// <see cref="IReadOnlyBiMap{TKey, TVal}"/>.</returns>
-        IEnumerator<KeyValuePair<TVal, IReadOnlyCollection<TKey>>>
-            GetReverseEnumerator();
     }
 }
