@@ -37,8 +37,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BiMap.cs" />
-    <Compile Include="BiMap.KeyCollection.cs" />
-    <Compile Include="BiMap.ValueCollection.cs" />
     <Compile Include="Interfaces\IBiMap.cs" />
     <Compile Include="Interfaces\IFixedKeysBiMap.cs" />
     <Compile Include="Interfaces\IFixedKeysMultiBiMap.cs" />

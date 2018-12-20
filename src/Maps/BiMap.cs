@@ -26,9 +26,6 @@ namespace Anvoker.Collections.Maps
         private Dictionary<TKey, TVal> dictFwd;
         private Dictionary<TVal, HashSet<TKey>> dictRev;
 
-        private KeyCollection keyCollection;
-        private ValueCollection valueCollection;
-
         /// <summary>
         /// Holds all of the keys that are associated with null values. We need
         /// it because dictRev cannot hold null as keys.
@@ -112,8 +109,6 @@ namespace Anvoker.Collections.Maps
                 capacity,
                 comparerValue);
             keysWithNullValue = new HashSet<TKey>(comparerKey);
-            keyCollection = new KeyCollection(this);
-            valueCollection = new ValueCollection(this);
         }
 
         /// <summary>
@@ -239,7 +234,7 @@ namespace Anvoker.Collections.Maps
         /// Gets a collection containing the keys in the
         /// <see cref="BiMap{TKey, TVal}"/>.
         /// </summary>
-        public KeyCollection Keys => keyCollection;
+        public IReadOnlyCollection<TKey> Keys => dictFwd.Keys;
 
         /// <summary>
         /// Gets the number of unique values contained in the
@@ -251,7 +246,7 @@ namespace Anvoker.Collections.Maps
         /// Gets a collection containing the values in the
         /// <see cref="BiMap{TKey, TVal}"/>.
         /// </summary>
-        public ValueCollection Values => valueCollection;
+        public IReadOnlyCollection<TVal> Values => dictFwd.Values;
 
         #endregion Public Properties
 
@@ -409,27 +404,6 @@ namespace Anvoker.Collections.Maps
             else
             {
                 return null;
-            }
-        }
-
-        /// <summary>
-        /// Returns an enumerator that iterates through the values-key elements
-        /// of the <see cref="BiMap{TKey, TVal}"/>. Since the same value can be
-        /// associated with multiple keys, keys are grouped in their own
-        /// collection in each element.
-        /// </summary>
-        /// <returns>A <see cref="Dictionary{TVal, IReadOnlyCollection{TKey}}
-        /// .Enumerator"/> structure for the
-        /// <see cref="BiMap{TKey, TVal}"/>.</returns>
-        public IEnumerator<KeyValuePair<TVal, TKey>>
-            GetReverseEnumerator()
-        {
-            foreach (var kvp in dictRev)
-            {
-                foreach (var value in kvp.Value)
-                {
-                    yield return new KeyValuePair<TVal, TKey>(kvp.Key, value);
-                }
             }
         }
 
