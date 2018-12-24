@@ -51,6 +51,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="InterfaceTesters\IBiMapBase.cs" />
     <Compile Include="Tracing.cs" />
     <Compile Include="MapTestDataConstructible.cs" />
     <Compile Include="InterfaceTesters\IRODictionaryNestedBase.cs" />

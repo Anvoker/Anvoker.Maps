@@ -11,5 +11,19 @@ namespace Anvoker.Collections.Maps
     public interface IBiMap<TKey, TVal> :
         IDictionary<TKey, TVal>,
         IFixedKeysBiMap<TKey, TVal>
-    { }
+    {
+        new int Count { get; }
+
+        new IReadOnlyCollection<TKey> Keys { get; }
+
+        new IReadOnlyCollection<TVal> Values { get; }
+
+        new bool ContainsKey(TKey key);
+
+        new TVal this[TKey key] { get; set; }
+
+        new IEnumerator<KeyValuePair<TKey, TVal>> GetEnumerator();
+
+        new bool TryGetValue(TKey key, out TVal values);
+    }
 }

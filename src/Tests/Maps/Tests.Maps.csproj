@@ -50,6 +50,7 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="ForwadingFixtures\ForwardingFixture_IBiMapNested.cs" />
     <Compile Include="ForwadingFixtures\ForwardingFixture_IReadOnlyDictionaryNested.cs" />
     <Compile Include="ForwadingFixtures\ForwardingFixture_IMultiBiMap.cs" />
     <Compile Include="MapTestDataSourceValidator.cs" />
