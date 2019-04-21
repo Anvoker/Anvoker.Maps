@@ -1,26 +1,20 @@
-﻿using System.Collections.Generic;
-
-namespace Anvoker.Collections.Maps
+﻿namespace Anvoker.Collections.Maps
 {
     /// <summary>
-    /// Represents a generic collection of key-value pairs where the values can
-    /// be changed but keys cannot be added or removed.
+    /// Represents a generic collection of keys and values where keys cannot be
+    /// added or removed and where keys can be retrieved by their associated
+    /// value.
     /// </summary>
-    /// <typeparam name="TKey">The type of the keys.</typeparam>
-    /// <typeparam name="TVal">The type of the values.</typeparam>
+    /// <typeparam name="TKey">The type of the keys
+    /// <see cref="IFixedKeysBiMap{TKey, TVal}"/>.</typeparam>
+    /// <typeparam name="TVal">The type of the values
+    /// <see cref="IFixedKeysBiMap{TKey, TVal}"/>.</typeparam>
     public interface IFixedKeysBiMap<TKey, TVal> :
         IReadOnlyBiMap<TKey, TVal>
     {
         /// <summary>
-        /// Gets all keys that are associated with the specified value.
-        /// </summary>
-        /// <param name="val">The value to locate the keys by.</param>
-        /// <returns>A read-only collection with all of the associated keys.
-        /// </returns>
-        IReadOnlyCollection<TKey> this[TVal val] { get; }
-
-        /// <summary>
-        /// Replaces the value currently associated with the specified key.
+        /// Replaces the value currently associated with the specified key with
+        /// a new value.
         /// </summary>
         /// <param name="key">The key of the value to replace.</param>
         /// <param name="value">The new value.</param>

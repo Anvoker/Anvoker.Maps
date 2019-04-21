@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props')" />
+  <Import Project="..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props" Condition="Exists('..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,7 +32,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -51,25 +51,43 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tracing.cs" />
-    <Compile Include="MapTestDataConstructible.cs" />
-    <Compile Include="InterfaceTesters\IRODictionaryNestedBase.cs" />
-    <Compile Include="InterfaceTesters\IMultiBiMapBase.cs" />
-    <Compile Include="MapTestDataConcrete.cs" />
-    <Compile Include="InterfaceTesters\IMultiMapBase.cs" />
+    <Compile Include="Interfaces\IKeyValuesData.cs" />
+    <Compile Include="InterfaceTesters\IBiMapTester.cs" />
+    <Compile Include="InterfaceTesters\ICollectionTester.cs" />
+    <Compile Include="Interfaces\IValueData.cs" />
+    <Compile Include="Interfaces\IKeyValueData.cs" />
+    <Compile Include="Interfaces\IData.cs" />
+    <Compile Include="InterfaceTesters\IMultiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IReadOnlyMultiBiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IReadOnlyCollectionTester.cs" />
+    <Compile Include="InterfaceTesters\IFixedKeysBiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IReadOnlyMultiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IFixedKeysMultiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IReadOnlyBiMapTester.cs" />
+    <Compile Include="InterfaceTesters\IDictionaryTester.cs" />
+    <Compile Include="MapData.cs" />
+    <Compile Include="MapDataConcrete.cs" />
+    <Compile Include="MapFixtureParamConstructor.cs" />
+    <Compile Include="InterfaceTesters\IReadOnlyDictionaryTester.cs" />
+    <Compile Include="MultiMapFixtureParamConstructor.cs" />
+    <Compile Include="InterfaceTesters\IEnumerableTester.cs" />
+    <Compile Include="MultiMapDataConcrete.cs" />
     <Compile Include="ExposedTestFixtureParams.cs" />
     <Compile Include="HelperMethods.cs" />
-    <Compile Include="MapTestData.cs" />
-    <Compile Include="InterfaceTesters\IDictionaryNestedBase.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="MultiMapData.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Maps\Maps.csproj">
       <Project>{ca98f1be-e77b-4b55-9b87-4f4f6f7bf412}</Project>
       <Name>Maps</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\NUnitFixtureDependent\NUnitFixtureDependent.csproj">
+      <Project>{ad1a36ab-c528-4507-9b45-f75f1806c7b1}</Project>
+      <Name>NUnitFixtureDependent</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -77,6 +95,6 @@
     <PropertyGroup>
       <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props'))" />
+    <Error Condition="!Exists('..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\..\..\Assets\NuGetPackages\NUnit.3.11.0\build\NUnit.props'))" />
   </Target>
 </Project>

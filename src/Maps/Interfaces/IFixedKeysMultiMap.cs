@@ -3,11 +3,14 @@
 namespace Anvoker.Collections.Maps
 {
     /// <summary>
-    /// Represents a generic collection of key-values elements where
-    /// elements cannot be added or removed.
+    /// Represents a generic collection of keys and values where keys cannot be
+    /// added or removed and where each key may be associated with multiple
+    /// values.
     /// </summary>
-    /// <typeparam name="TKey">The type of the keys.</typeparam>
-    /// <typeparam name="TVal">The type of the values.</typeparam>
+    /// <typeparam name="TKey">The type of the keys
+    /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>.</typeparam>
+    /// <typeparam name="TVal">The type of the values
+    /// <see cref="IFixedKeysMultiMap{TKey, TVal}"/>.</typeparam>
     public interface IFixedKeysMultiMap<TKey, TVal> :
         IReadOnlyMultiMap<TKey, TVal>
     {
@@ -32,8 +35,6 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if at least one value didn't exist already and was
         /// added; otherwise, false.</returns>
         bool AddValues(TKey key, IEnumerable<TVal> values);
-
-        void Replace(TKey key, IEnumerable<TVal> values);
 
         /// <summary>
         /// Removes the value associated with the specified key from the
@@ -66,5 +67,13 @@ namespace Anvoker.Collections.Maps
         /// <returns>true if the element is successfully found and its values
         /// removed; otherwise, false.</returns>
         bool RemoveValuesAll(TKey key);
+
+        /// <summary>
+        /// Replaces the values currently associated with the specified key with
+        /// a new collection of values.
+        /// </summary>
+        /// <param name="key">The key of the value to replace.</param>
+        /// <param name="values">The new values.</param>
+        void Replace(TKey key, IEnumerable<TVal> values);
     }
 }

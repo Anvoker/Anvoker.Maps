@@ -36,7 +36,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -50,21 +50,52 @@
     </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="ForwadingFixtures\ForwardingFixture_IReadOnlyDictionaryNested.cs" />
-    <Compile Include="ForwadingFixtures\ForwardingFixture_IMultiBiMap.cs" />
-    <Compile Include="MapTestDataSourceValidator.cs" />
-    <Compile Include="MapTestDataSource.cs" />
-    <Compile Include="MultiBiMap\MultiBiMapHelpers.cs" />
-    <Compile Include="MultiBiMap\FixtureSource_IRODictionaryNested.cs" />
-    <Compile Include="MultiBiMap\FixtureSource_IDictionaryNested.cs" />
-    <Compile Include="MultiBiMap\FixtureSource_IMultiBiMap.cs" />
-    <Compile Include="MultiMap\Constructors.cs" />
+    <Compile Include="BiMap\FixtureSource_IEnumerable.cs" />
+    <Compile Include="BiMap\FixtureSource_IFixedKeysBiMap.cs" />
+    <Compile Include="BiMap\FixtureSource_IBiMap.cs" />
+    <Compile Include="BiMap\FixtureSource_ICollection.cs" />
+    <Compile Include="BiMap\FixtureSource_IReadOnlyCollection.cs" />
+    <Compile Include="BiMap\FixtureSource_IDictionary.cs" />
+    <Compile Include="BiMap\FixtureSource_IReadOnlyDictionary.cs" />
+    <Compile Include="BiMap\FixtureSource_IReadOnlyBiMap.cs" />
+    <Compile Include="BiMap\BiMapHelpers.cs" />
+    <Compile Include="ForwadingFixtures\FF_IReadOnlyBiMap.cs" />
+    <Compile Include="ForwadingFixtures\FF_IFixedKeysBiMap.cs" />
+    <Compile Include="ForwadingFixtures\FF_IBiMap.cs" />
+    <Compile Include="ForwadingFixtures\FF_IDictionary.cs" />
+    <Compile Include="ForwadingFixtures\FF_ICollection.cs" />
+    <Compile Include="ForwadingFixtures\FF_IReadOnlyMultiMap.cs" />
+    <Compile Include="ForwadingFixtures\FF_IFixedKeysMultiMap.cs" />
+    <Compile Include="ForwadingFixtures\FF_IEnumerable.cs" />
+    <Compile Include="ForwadingFixtures\FF_IReadOnlyCollection.cs" />
+    <Compile Include="ForwadingFixtures\FF_IReadOnlyDictionary.cs" />
+    <Compile Include="ForwadingFixtures\FF_IReadOnlyMultiBiMap.cs" />
+    <Compile Include="MapDataSource.cs" />
+    <Compile Include="MapDataSourceValidator.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_ICollection.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IDictionary.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IEnumerable.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IFixedKeysBiMap.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IFixedKeysMultiMap.cs" />
     <Compile Include="MultiBiMap\FixtureSource_IMultiMap.cs" />
-    <Compile Include="ForwadingFixtures\ForwardingFixture_IMultiMap.cs" />
-    <Compile Include="ForwadingFixtures\ForwardingFixture_IDictionaryNested.cs" />
-    <Compile Include="MultiMap\FixtureSource_IDictionaryNested.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IReadOnlyBiMap.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IReadOnlyCollection.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IReadOnlyDictionary.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IReadOnlyMultiBiMap.cs" />
+    <Compile Include="MultiBiMap\FixtureSource_IReadOnlyMultiMap.cs" />
+    <Compile Include="MultiMap\FixtureSource_ICollection.cs" />
+    <Compile Include="MultiMap\FixtureSource_IDictionary.cs" />
+    <Compile Include="ValidationHelper.cs" />
+    <Compile Include="MultiMapDataSourceValidator.cs" />
+    <Compile Include="MultiMapDataSource.cs" />
+    <Compile Include="MultiBiMap\MultiBiMapHelpers.cs" />
+    <Compile Include="ForwadingFixtures\FF_IMultiMap.cs" />
+    <Compile Include="MultiMap\FixtureSource_IEnumerable.cs" />
     <Compile Include="MultiMap\FixtureSource_IMultiMap.cs" />
-    <Compile Include="MultiMap\FixtureSource_IRODictionaryNested.cs" />
+    <Compile Include="MultiMap\FixtureSource_IReadOnlyCollection.cs" />
+    <Compile Include="MultiMap\FixtureSource_IFixedKeysMultiMap.cs" />
+    <Compile Include="MultiMap\FixtureSource_IReadOnlyMultiMap.cs" />
+    <Compile Include="MultiMap\FixtureSource_IReadOnlyDictionary.cs" />
     <Compile Include="MultiMap\MultiMapHelpers.cs" />
   </ItemGroup>
   <ItemGroup>

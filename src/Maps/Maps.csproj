@@ -26,7 +26,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -36,7 +36,9 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BiMap.cs" />
+    <Compile Include="CollectionEqualityComparer.cs" />
+    <Compile Include="CompositeBiMap.cs" />
+    <Compile Include="Interfaces\IReadOnlyMultiBiMap.cs" />
     <Compile Include="Interfaces\IBiMap.cs" />
     <Compile Include="Interfaces\IFixedKeysBiMap.cs" />
     <Compile Include="Interfaces\IFixedKeysMultiBiMap.cs" />
@@ -44,10 +46,11 @@
     <Compile Include="Interfaces\IMultiBiMap.cs" />
     <Compile Include="Interfaces\IMultiMap.cs" />
     <Compile Include="Interfaces\IReadOnlyBiMap.cs" />
-    <Compile Include="Interfaces\IReadOnlyMultiBiMap.cs" />
+    <Compile Include="Interfaces\ICollectionEqualityComparer.cs" />
+    <Compile Include="Interfaces\ISetQueryableKeys.cs" />
     <Compile Include="Interfaces\IReadOnlyMultiMap.cs" />
-    <Compile Include="MultiBiMap.cs" />
-    <Compile Include="MultiMap.cs" />
+    <Compile Include="CompositeMultiBiMap.cs" />
+    <Compile Include="CompositeMultiMap.cs" />
     <Compile Include="ValueSet.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
