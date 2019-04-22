@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using NUnit.FixtureDependent;
 using NUnit.Framework.Interfaces;
 using NUnit.Framework.Internal;
 

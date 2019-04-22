@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Anvoker.Collections.Maps;
 using Anvoker.Collections.Tests.Common.Interfaces;
+using NUnit.FixtureDependent;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 

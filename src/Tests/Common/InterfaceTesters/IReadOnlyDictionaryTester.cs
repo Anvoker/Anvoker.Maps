@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Anvoker.Collections.Tests.Common.Interfaces;
+using NUnit.FixtureDependent;
 using NUnit.Framework;
 using NUnit.Framework.Internal;
 using static Anvoker.Collections.Tests.Common.HelperMethods;
