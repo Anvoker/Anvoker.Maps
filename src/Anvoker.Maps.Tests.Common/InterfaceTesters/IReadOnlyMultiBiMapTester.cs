@@ -73,7 +73,7 @@ namespace Anvoker.Maps.Tests.Common
         public void GetKeysWith_Excluded(
             [ValueSource(nameof(SelectorCases))]
             string selectorKey,
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
                 nameof(IKeyValuesData<TK, TV, TROMBiMap, TVCol>.KVPsExcluded))]
             KeyValuePair<TK, TVCol> kvp)
         {
@@ -90,7 +90,7 @@ namespace Anvoker.Maps.Tests.Common
         public void GetKeysWith_Initial(
             [ValueSource(nameof(SelectorCases))]
             string selectorKey,
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
                 nameof(IKeyValuesData<TK, TV, TROMBiMap, TVCol>.KVPsInitial))]
             KeyValuePair<TK, TVCol> kvp)
         {
@@ -105,7 +105,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void GetKeysWithValue_Excluded(
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
             nameof(IKeyValuesData<TK, TV, TROMBiMap, TVCol>.KVPsExcluded))]
             KeyValuePair<TK, TVCol> kvp)
         {
@@ -124,7 +124,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void GetKeysWithValue_Initial(
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
             nameof(IKeyValuesData<TK, TV, TROMBiMap, TVCol>.KVPsInitial))]
             KeyValuePair<TK, TVCol> kvp)
         {

@@ -29,14 +29,14 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void ContainsKey_ExcludedKeys(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysExcluded))]
             TK key)
             => Assert.IsFalse(dictionary.ContainsKey(key));
 
         [Test, SequentialDependent]
         public void ContainsKey_InitialKeys(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysInitial))]
             TK key)
             => Assert.IsTrue(dictionary.ContainsKey(key));
@@ -69,17 +69,17 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Indexer_Get_ExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysInitial))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.ValuesInitial))]
             TV expectedValue)
             => Assert.AreEqual(expectedValue, dictionary[key]);
 
         [Test, SequentialDependent]
         public void Indexer_Get_NonExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysExcluded))]
             TK key)
             => Assert.Throws<KeyNotFoundException>(()
@@ -92,10 +92,10 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void TryGetValue_ExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysInitial))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.ValuesInitial))]
             TV expectedValue)
         {
@@ -110,7 +110,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void TryGetValue_NonExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TRODictionary>.KeysExcluded))]
             TK key)
         {

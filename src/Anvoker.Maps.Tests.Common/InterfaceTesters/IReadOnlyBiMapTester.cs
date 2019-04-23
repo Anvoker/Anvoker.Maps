@@ -35,21 +35,21 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void ContainsValue_Excluded(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TROBiMap>.ValuesExcluded))]
             TV value)
             => Assert.False(bimap.ContainsValue(value));
 
         [Test, SequentialDependent]
         public void ContainsValue_Initial(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TROBiMap>.ValuesInitial))]
             TV value)
             => Assert.True(bimap.ContainsValue(value));
 
         [Test, SequentialDependent]
         public void GetKeysWithValue_Existing(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TROBiMap>.ValuesInitial))]
             TV value)
         {
@@ -62,7 +62,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void GetKeysWithValue_NonExisting(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TROBiMap>.ValuesExcluded))]
             TV value)
             => CollectionAssert.IsEmpty(bimap.GetKeysWithValue(value));

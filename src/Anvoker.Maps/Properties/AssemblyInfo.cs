@@ -6,10 +6,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Anvoker.Maps")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Provides map collections with compatibility with standard collection interfaces, including multimaps and bimaps.")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Anvoker.Maps.Properties")]
+[assembly: AssemblyCompany("Andrei Ionescu")]
+[assembly: AssemblyProduct("Anvoker.Maps")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

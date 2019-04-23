@@ -37,14 +37,14 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void ContainsValue_Excluded(
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
                 nameof(IKeyValuesData<TK, TV, TROMMap, TVCol>.ValuesExcludedFlat))]
             TV value)
             => Assert.False(map.ContainsValue(value));
 
         [Test, SequentialDependent]
         public void ContainsValue_Initial(
-            [ValueDependentSource(typeof(IKeyValuesData<,,,>),
+            [FixtureValueSource(typeof(IKeyValuesData<,,,>),
                 nameof(IKeyValuesData<TK, TV, TROMMap, TVCol>.ValuesInitialFlat))]
             TV value)
             => Assert.True(map.ContainsValue(value));

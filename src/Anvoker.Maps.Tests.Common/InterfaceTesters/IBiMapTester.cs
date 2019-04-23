@@ -28,20 +28,20 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Add_ExistingKeyThrows(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysInitial))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.ValuesInitial))]
             TV value)
             => Assert.Throws<ArgumentException>(() => bimap.Add(key, value));
 
         [Test, SequentialDependent]
         public void Add_NonExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysToAdd))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.ValuesToAdd))]
             TV value)
         {
@@ -74,10 +74,10 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Indexer_Set_ExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysInitial))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.ValuesInitial))]
             TV value)
         {
@@ -87,10 +87,10 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Indexer_Set_NonExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysToAdd))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.ValuesToAdd))]
             TV value)
         {
@@ -112,7 +112,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Remove_Key_Existing(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysInitial))]
             TK key)
         {
@@ -137,7 +137,7 @@ namespace Anvoker.Maps.Tests.Common
 
         [Test, SequentialDependent]
         public void Remove_Key_NonExisting(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysExcluded))]
             TK key)
         {
@@ -171,10 +171,10 @@ namespace Anvoker.Maps.Tests.Common
         [Test]
         [SequentialDependent]
         public void Replace_ExistingKey(
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.KeysInitial))]
             TK key,
-            [ValueDependentSource(typeof(IKeyValueData<,,>),
+            [FixtureValueSource(typeof(IKeyValueData<,,>),
                 nameof(IKeyValueData<TK, TV, TBiMap>.ValuesToAdd))]
             TV newValue)
         {
