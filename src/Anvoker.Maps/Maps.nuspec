@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Anvoker.Maps</id>
+    <version>1.0.0</version>
+    <title>Anvoker.Maps</title>
+    <authors>Andrei Ionescu</authors>
+    <owners>Andrei Ionescu</owners>
+    <licenseUrl>https://gitlab.com/Anvoker/anvoker.maps/raw/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://gitlab.com/Anvoker/anvoker.maps</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Provides robust map collections for C# with high compatibility with core collection interfaces, including BiMap, MultiMap and MultiBiMap.</description>
+    <releaseNotes>Initial release.</releaseNotes>
+    <copyright>Copyright 2019 Andrei Ionescu</copyright>
+    <tags>map maps multimap bimap collection collections dictionary multidictionary bidictionary data structure</tags>
+  </metadata>
+</package>
