@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.28010.2046
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maps", "src\Maps\Maps.csproj", "{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Maps", "src\Anvoker.Maps\Maps.csproj", "{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Maps", "src\Tests\Maps\Tests.Maps.csproj", "{32303BA1-931C-459C-B90D-CF950F4C786B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Maps", "src\Anvoker.Maps.Tests\Tests.csproj", "{32303BA1-931C-459C-B90D-CF950F4C786B}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412} = {CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}
 	EndProjectSection
@@ -15,7 +15,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		Anvoker.Collections.sln.vsspell = Anvoker.Collections.sln.vsspell
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "src\Tests\Common\Tests.Common.csproj", "{BEAB10EF-BD0D-4144-9AD0-D3BD1C052246}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.Common", "src\Anvoker.Maps.Tests.Common\Tests.Common.csproj", "{BEAB10EF-BD0D-4144-9AD0-D3BD1C052246}"
 	ProjectSection(ProjectDependencies) = postProject
 		{CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412} = {CA98F1BE-E77B-4B55-9B87-4F4F6F7BF412}
 	EndProjectSection
