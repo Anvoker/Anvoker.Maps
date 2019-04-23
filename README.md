@@ -1,5 +1,7 @@
 # Anvoker.Maps
 
+[![Nuget](https://buildstats.info/nuget/Anvoker.Maps) Download the NuGet package.](https://www.nuget.org/packages/Anvoker.Maps/)
+
 Provides robust map collections for C# with high compatibility with core collection interfaces.
 
 In almost every place you could use a normal Dictionary, you can also use a map from this repository due to them implementing all the relevant interfaces.
