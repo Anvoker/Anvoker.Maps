@@ -13,7 +13,7 @@ namespace Anvoker.Maps.Tests.MultiMap
             where TVCol : IEnumerable<TV>
             => new CollectionEqualityComparer<TV, TVCol>(d.ComparerValue);
 
-        public static IMultiMap<TKey, TVal> Ctor<TKey, TVal>(
+        public static IMultiMap<TKey, TVal> CompositeCtor<TKey, TVal>(
             MultiMapData<TKey, TVal> d)
         {
             var m = new CompositeMultiMap<TKey, TVal>(d.ComparerKey, d.ComparerValue);
@@ -39,7 +39,7 @@ namespace Anvoker.Maps.Tests.MultiMap
         {
             return MultiMapFixtureParamConstructor<TK, TV, TVCol, TCollection>
                 .Construct(
-                    (d) => (TCollection)Ctor(d),
+                    (d) => (TCollection)CompositeCtor(d),
                     CtorVCol<TV, TVCol>,
                     ComparerCol<TK, TV, TVCol>,
                     data,

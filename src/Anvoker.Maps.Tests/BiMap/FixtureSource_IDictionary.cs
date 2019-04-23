@@ -16,16 +16,16 @@ namespace Anvoker.Maps.Tests.BiMap
         { get; } = new ITestFixtureData[]
         {
             MapFixtureParamConstructor<int, decimal, IDictionary<int, decimal>>
-                .Construct(Ctor, IntDecimal, Name, fixtureName),
+                .Construct(CompositeCtor, IntDecimal, Name, fixtureName),
 
             MapFixtureParamConstructor<string, string, IDictionary<string, string>>
-                .Construct(Ctor, StringStringInsensitive, Name, fixtureName),
+                .Construct(CompositeCtor, StringStringInsensitive, Name, fixtureName),
 
             MapFixtureParamConstructor<string, string, IDictionary<string, string>>
-                .Construct(Ctor, StringStringSensitive, Name, fixtureName),
+                .Construct(CompositeCtor, StringStringSensitive, Name, fixtureName),
 
             MapFixtureParamConstructor<int[], Type, IDictionary<int[], Type>>
-                .Construct(Ctor, ArrayIntType, Name, fixtureName),
+                .Construct(CompositeCtor, ArrayIntType, Name, fixtureName),
         };
     }
 }
