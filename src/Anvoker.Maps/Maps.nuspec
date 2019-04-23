@@ -6,7 +6,7 @@
     <title>Anvoker.Maps</title>
     <authors>Andrei Ionescu</authors>
     <owners>Andrei Ionescu</owners>
-    <licenseUrl>https://gitlab.com/Anvoker/anvoker.maps/raw/master/LICENSE.txt</licenseUrl>
+    <licenseUrl>https://gitlab.com/Anvoker/anvoker.maps/raw/master/LICENSE</licenseUrl>
     <projectUrl>https://gitlab.com/Anvoker/anvoker.maps</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Provides robust map collections for C# with high compatibility with core collection interfaces, including BiMap, MultiMap and MultiBiMap.</description>
