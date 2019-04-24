@@ -32,11 +32,11 @@ So far the only implementation is the composite "family". Named thusly because t
 - ``CompositeMultiBiMap<T, K>``. Uses three dictionaries. One that maps keys to value hashsets, a second that maps value hashsets to keys, and a third dictionary that maps unique values to key hashsets.
 
 ## Features & Complexity
-| Implementation      | Fwd Lookup     | Rev     Lookup | Add         | Remove      | ContainsKey | ContainsValue | Space            |
+| Implementation      | Forward Lookup | Reverse Lookup | Add         | Remove      | ContainsKey | ContainsValue | Space            |
 | ------------------- | -------------- | -------------- | ----------- | ----------- | ----------- | ------------- | ---------------- |
-| CompositeBiMap      | O(1)/O(n)      | O(1)/O(n)      | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)     | O(2\*k + vu)     |
-| CompositeMultiMap   | O(1)/O(n)      | N/A            | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(k)/O(k^2)   | O(k + v)         |
-| CompositeMultiBiMap | O(1)/O(n)      | O(1)/O(n)      | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)     | O(3\*k + v + vu) | 
+| CompositeBiMap      | O(1)/O(n)      | O(1)/O(n)      | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)     | O(2\*k+vu)       |
+| CompositeMultiMap   | O(1)/O(n)      | N/A            | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(k)/O(k^2)   | O(k+v)           |
+| CompositeMultiBiMap | O(1)/O(n)      | O(1)/O(n)      | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)   | O(1)/O(n)     | O(3\*k+v+vu)     | 
 
 Note: values to the left of the slash indicate the "average" case, generally signifying the absence of hash collisions. The value to the right indicates the actual worst case time complexity.
 - n  => generic item count.
