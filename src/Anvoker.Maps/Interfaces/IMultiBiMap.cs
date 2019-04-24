@@ -1,4 +1,4 @@
-﻿namespace Anvoker.Maps
+﻿namespace Anvoker.Maps.Interfaces
 {
     /// <summary>
     /// Represents a generic collection of keys and values where each key may be

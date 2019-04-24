@@ -1,4 +1,5 @@
 ﻿using System;
+using Anvoker.Maps.Interfaces;
 using Anvoker.Maps.Tests.Common.Interfaces;
 using NUnit.Framework;
 using NUnit.Framework.Internal;

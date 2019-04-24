@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Anvoker.Maps.Interfaces;
 
 namespace Anvoker.Maps
 {

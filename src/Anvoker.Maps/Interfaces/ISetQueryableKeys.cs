@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Anvoker.Maps
+namespace Anvoker.Maps.Interfaces
 {
     /// <summary>
     /// Represents a collection where keys can be retrieved by querying the set

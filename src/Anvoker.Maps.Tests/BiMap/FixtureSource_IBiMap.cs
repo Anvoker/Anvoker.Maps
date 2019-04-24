@@ -1,4 +1,5 @@
 ﻿using System;
+using Anvoker.Maps.Interfaces;
 using Anvoker.Maps.Tests.Common;
 using NUnit.Framework.Interfaces;
 using static Anvoker.Maps.Tests.BiMap.BiMapHelpers;

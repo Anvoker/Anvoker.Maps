@@ -1,4 +1,5 @@
-﻿using Anvoker.Maps.Tests.Common;
+﻿using Anvoker.Maps.Interfaces;
+using Anvoker.Maps.Tests.Common;
 using NUnit.Framework;
 
 namespace Anvoker.Maps.Tests

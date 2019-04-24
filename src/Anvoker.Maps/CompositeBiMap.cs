@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Anvoker.Maps.Interfaces;
 
 #pragma warning disable RCS1104 // Simplify conditional expression
 

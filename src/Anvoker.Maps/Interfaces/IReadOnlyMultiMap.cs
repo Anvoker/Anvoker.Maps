@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Anvoker.Maps
+namespace Anvoker.Maps.Interfaces
 {
     /// <summary>
     /// Represents a read-only generic collection of keys and values where each

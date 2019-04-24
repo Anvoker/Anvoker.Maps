@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Anvoker.Maps.Interfaces;
 using Anvoker.Maps.Tests.Common.Interfaces;
 using NUnit.FixtureDependent;
 using NUnit.Framework;
